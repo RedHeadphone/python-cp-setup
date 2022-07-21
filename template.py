@@ -5,6 +5,9 @@ from functools import lru_cache
 import bisect
 import heapq
 
+# import sys 
+# sys.setrecursionlimit(10**6) 
+
 class UnionFind:
     def __init__(self, n):
         self.n = n
