@@ -1,12 +1,60 @@
 import random
 import math
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, deque
 from functools import lru_cache
 import bisect
 import heapq
+import sys
 
-# import sys 
+input = sys.stdin.readline
 # sys.setrecursionlimit(10**6) 
+
+class SegmentTree:
+
+    def __init__(self, nums):
+        self._size = len(nums)
+        self._tree = [0] * (4 * self._size)
+        self.build(nums)
+
+    def build(self, a, v=1, lo=0, hi=None):
+        if hi is None:
+            hi = self._size - 1
+            
+        if lo == hi:
+            self._tree[v] = a[lo]
+        else:
+            mi = (lo + hi) // 2
+            self.build(a, 2 * v, lo, mi)
+            self.build(a, 2 * v + 1, mi + 1, hi)
+            self._tree[v] = self._tree[2 * v] + self._tree[2 * v + 1]
+        
+    def update(self, pos, val, v=1, lo=0, hi=None):
+        if hi is None:
+            hi = self._size - 1
+            
+        if lo == hi:
+            self._tree[v] = val
+        else:
+            mi = (lo + hi) // 2
+            if pos <= mi:
+                self.update(pos, val, 2 * v, lo, mi)
+            else:
+                self.update(pos, val, 2 * v + 1, mi + 1, hi)
+            
+            self._tree[v] = self._tree[2 * v] + self._tree[2 * v + 1]
+        
+    def query(self, l, h, v=1, lo=0, hi=None):
+        if hi is None:
+            hi = self._size - 1
+            
+        if l > h:
+            return 0
+        elif l == lo and h == hi:
+            return self._tree[v]
+        else:
+            mi = (lo + hi) // 2
+            return self.query(l, min(mi, h), 2 * v, lo, mi) +\
+                   self.query(max(mi + 1, l), h, 2 * v + 1, mi + 1, hi)
 
 class UnionFind:
     def __init__(self, n):
@@ -32,7 +80,7 @@ def is_prime(n):
             return False
     return True
 
-def google(t):
+def case(t):
     print("Case #{}:".format(t), end=" ")
 
 RANDOM = random.randrange(2**62)
@@ -47,5 +95,5 @@ def solve():
 ###############################################################################
 
 for t in range(int(input())):
-    # google(t+1)
+    # case(t+1)
     solve()
