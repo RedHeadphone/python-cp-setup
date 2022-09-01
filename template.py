@@ -6,7 +6,7 @@ import bisect
 import heapq
 import sys
 
-input = sys.stdin.readline
+input = lambda : sys.stdin.readline().strip()
 # sys.setrecursionlimit(10**6) 
 
 class SegmentTree:
