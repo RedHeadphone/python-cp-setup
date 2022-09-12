@@ -10,51 +10,39 @@ input = lambda : sys.stdin.readline().strip()
 # sys.setrecursionlimit(10**6) 
 
 class SegmentTree:
+    def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
+        self.n = len(arr)
+        self.segmentTree = [0]*self.n + arr
+        self.func = func
+        self.defaultvalue = defaultvalue
+        self.buildSegmentTree(arr)
 
-    def __init__(self, nums):
-        self._size = len(nums)
-        self._tree = [0] * (4 * self._size)
-        self.build(nums)
+    def buildSegmentTree(self, arr) :   
+        for i in range(self.n -1, 0, -1) :
+            self.segmentTree[i] = self.func(self.segmentTree[2*i] , self.segmentTree[2*i+1])         
+            
+    def query(self, l, r) :
+        l += self.n
+        r += self.n
+        res = self.defaultvalue
+        while l < r :
+            if l & 1 :   
+                res = self.func(res, self.segmentTree[l])
+                l += 1
+            l >>= 1
+            if r & 1 :  
+                r -= 1      
+                res = self.func(res, self.segmentTree[r]) 
+            r >>= 1
+        return res
 
-    def build(self, a, v=1, lo=0, hi=None):
-        if hi is None:
-            hi = self._size - 1
-            
-        if lo == hi:
-            self._tree[v] = a[lo]
-        else:
-            mi = (lo + hi) // 2
-            self.build(a, 2 * v, lo, mi)
-            self.build(a, 2 * v + 1, mi + 1, hi)
-            self._tree[v] = self._tree[2 * v] + self._tree[2 * v + 1]
-        
-    def update(self, pos, val, v=1, lo=0, hi=None):
-        if hi is None:
-            hi = self._size - 1
-            
-        if lo == hi:
-            self._tree[v] = val
-        else:
-            mi = (lo + hi) // 2
-            if pos <= mi:
-                self.update(pos, val, 2 * v, lo, mi)
-            else:
-                self.update(pos, val, 2 * v + 1, mi + 1, hi)
-            
-            self._tree[v] = self._tree[2 * v] + self._tree[2 * v + 1]
-        
-    def query(self, l, h, v=1, lo=0, hi=None):
-        if hi is None:
-            hi = self._size - 1
-            
-        if l > h:
-            return 0
-        elif l == lo and h == hi:
-            return self._tree[v]
-        else:
-            mi = (lo + hi) // 2
-            return self.query(l, min(mi, h), 2 * v, lo, mi) +\
-                   self.query(max(mi + 1, l), h, 2 * v + 1, mi + 1, hi)
+    def update(self, i, value) :
+        i += self.n
+        self.segmentTree[i] = value  
+        while i > 1 :
+            i >>= 1         
+            self.segmentTree[i] = self.func(self.segmentTree[2*i] , self.segmentTree[2*i+1])
+
 
 class UnionFind:
     def __init__(self, n):
