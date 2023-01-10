@@ -1,9 +1,9 @@
 import random
 import math
 from collections import defaultdict, Counter, deque, OrderedDict
+from heapq import heapify, heappush, heappop
 from functools import lru_cache
-import bisect
-import heapq
+from bisect import bisect_left, bisect_right
 import sys
 
 input = lambda : sys.stdin.readline().strip()
