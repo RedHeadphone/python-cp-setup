@@ -2,12 +2,12 @@ import random
 import math
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
-from functools import lru_cache
+from functools import lru_cache, reduce
 from bisect import bisect_left, bisect_right
 import sys
 
 input = lambda : sys.stdin.readline().strip()
-# sys.setrecursionlimit(10**6) 
+# sys.setrecursionlimit(10**6)    # doesn't work on codeforces
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -79,9 +79,21 @@ def ncr(n, r, p):
 def case(t):
     print("Case #{}:".format(t), end=" ")
 
+# For codeforces - hashing function 
 RANDOM = random.randrange(2**62)
 def Wrapper(x):
   return x ^ RANDOM
+
+def factors(n): 
+    if n==0:
+        return set()   
+    return set(reduce(list.__add__, 
+                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+# MAX = 10**5+5
+# factors = [factors(i) for i in range(MAX)]
+
+MOD = 10**9 + 7
 
 ###############################################################################
 
