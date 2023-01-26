@@ -95,6 +95,26 @@ def factors(n):
 
 MOD = 10**9 + 7
 
+def binpow(a, b):
+    if b==0:
+        return 1
+    res = binpow(a,b//2)
+    res = pow(res,2,MOD)
+    if b%2:
+        return (res*a)%MOD
+    return res
+
+def mod_inverse(a):
+    return binpow(a,MOD-2)
+
+MAX = 2*(10**5)+5
+
+# fact = [1]*MAX
+# invfact = [1]*MAX
+# for i in range(1,MAX):
+#     fact[i] = (fact[i-1]*i)%MOD
+#     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
+
 ###############################################################################
 
 def solve():
