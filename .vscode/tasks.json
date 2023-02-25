@@ -1,0 +1,25 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run main.py",
+            "type": "shell",
+            "command": "python main.py < input.txt > output.txt",
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate inputs to input.txt",
+            "type": "shell",
+            "command": "python testcase_gen.py > input.txt",
+            "problemMatcher": []
+        },
+        {
+            "label": "Compare bruteforce with main.py",
+            "type": "shell",
+            "command": "python main.py < input.txt > output.txt && python bruteforce.py < input.txt > output_bruteforce.txt && diff output.txt output_bruteforce.txt",
+            "problemMatcher": []
+        }
+    ]
+}
