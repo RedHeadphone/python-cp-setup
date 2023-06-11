@@ -48,6 +48,7 @@ class UnionFind:
     def __init__(self, n):
         self.n = n
         self.parents = list(range(n))
+        self.count = [1]*n
     def find(self, x):
         if self.parents[x] == x:
             return x
@@ -59,6 +60,7 @@ class UnionFind:
         y = self.find(y)
         if x != y:
             self.parents[x] = y
+            self.count[y] += self.count[x]
 
 dire = [0,1,0,-1,0]
 
