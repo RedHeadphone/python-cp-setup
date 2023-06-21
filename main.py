@@ -4,6 +4,7 @@ from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
 from functools import lru_cache, reduce
 from bisect import bisect_left, bisect_right
+from types import GeneratorType
 import sys
 
 input = lambda : sys.stdin.readline().strip()
@@ -117,10 +118,61 @@ MAX = 2*(10**5)+5
 #     fact[i] = (fact[i-1]*i)%MOD
 #     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
 
+def bootstrap(f):  
+    stack = []
+    def wrappedfunc(*args, **kwargs):
+        if stack:
+            return f(*args, **kwargs)
+        else:
+            to = f(*args, **kwargs)
+            while True:
+                if type(to) is GeneratorType:
+                    stack.append(to)
+                    to = next(to)
+                else:
+                    stack.pop()
+                    if not stack:
+                        break
+                    to = stack[-1].send(to)
+            return to
+    return wrappedfunc
+
 ###############################################################################
 
+
 def solve():
-    pass
+    n = int(input())
+    mapp = defaultdict(list)
+    for i in range(n-1):
+        a,b = map(int,input().split())
+        mapp[a].append(b)
+        mapp[b].append(a)
+    q = int(input())
+    queries = []
+    for i in range(q):
+        a,b = map(int,input().split())
+        queries.append((a,b))
+    ans_mapp = {}
+
+    @bootstrap
+    def dfs(node, parent = None):
+        leaf_nodes = 0
+        child_count = 0
+        for child in mapp[node]:
+            if child!=parent:
+                child_count += 1
+                leaf_nodes += (yield dfs(child,node))
+        if child_count == 0:
+            leaf_nodes = 1
+        ans_mapp[Wrapper(node)] = leaf_nodes
+        yield leaf_nodes
+
+    dfs(1)
+
+    for a,b in queries:
+        print(ans_mapp[Wrapper(a)]*ans_mapp[Wrapper(b)])
+
+
 
 ###############################################################################
 

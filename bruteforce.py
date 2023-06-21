@@ -4,10 +4,10 @@ from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
 from functools import lru_cache, reduce
 from bisect import bisect_left, bisect_right
+from types import GeneratorType
 import sys
 
 input = lambda : sys.stdin.readline().strip()
-# sys.setrecursionlimit(10**6)    # doesn't work on codeforces
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -65,6 +65,8 @@ class UnionFind:
 dire = [0,1,0,-1,0]
 
 def is_prime(n):
+    if n==1:
+        return False
     for i in range(2,int(n**0.5)+1):
         if n%i==0:
             return False
@@ -83,8 +85,14 @@ def case(t):
 
 # For codeforces - hashing function 
 RANDOM = random.randrange(2**62)
-def Wrapper(x):
+def mapping_wrapper(x):
   return x ^ RANDOM
+
+class hash_map(dict):
+    def __setitem__(self, key, value):
+        super().__setitem__(mapping_wrapper(key), value)
+    def __getitem__(self, key):
+        return super().__getitem__(mapping_wrapper(key))
 
 def factors(n): 
     if n==0:
@@ -116,6 +124,25 @@ MAX = 2*(10**5)+5
 # for i in range(1,MAX):
 #     fact[i] = (fact[i-1]*i)%MOD
 #     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
+
+def bootstrap(f):  # change 'return' to 'yield' and add 'yield' before calling the function
+    stack = []
+    def wrappedfunc(*args, **kwargs):
+        if stack:
+            return f(*args, **kwargs)
+        else:
+            to = f(*args, **kwargs)
+            while True:
+                if type(to) is GeneratorType:
+                    stack.append(to)
+                    to = next(to)
+                else:
+                    stack.pop()
+                    if not stack:
+                        break
+                    to = stack[-1].send(to)
+            return to
+    return wrappedfunc
 
 ###############################################################################
 
