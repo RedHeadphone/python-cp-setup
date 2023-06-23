@@ -8,7 +8,6 @@ from types import GeneratorType
 import sys
 
 input = lambda : sys.stdin.readline().strip()
-# sys.setrecursionlimit(10**6)    # doesn't work on codeforces
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -66,6 +65,8 @@ class UnionFind:
 dire = [0,1,0,-1,0]
 
 def is_prime(n):
+    if n==1:
+        return False
     for i in range(2,int(n**0.5)+1):
         if n%i==0:
             return False
@@ -82,19 +83,17 @@ def ncr(n, r, p):
 def case(t):
     print("Case #{}:".format(t), end=" ")
 
-# For codeforces - hashing function 
+# For codeforces - hashmap to avoid TLE
 RANDOM = random.randrange(2**62)
-def Wrapper(x):
+def mapping_wrapper(x):
   return x ^ RANDOM
 
-def factors(n): 
-    if n==0:
-        return set()   
-    return set(reduce(list.__add__, 
-                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+class HashMap(dict):
+    def __setitem__(self, key, value):
+        super().__setitem__(mapping_wrapper(key), value)
+    def __getitem__(self, key):
+        return super().__getitem__(mapping_wrapper(key))
 
-# MAX = 10**5+5
-# factors = [factors(i) for i in range(MAX)]
 
 MOD = 10**9 + 7
 
@@ -112,12 +111,23 @@ def mod_inverse(a):
 
 MAX = 2*(10**5)+5
 
+def factors(n): 
+    if n==0:
+        return set()   
+    return set(reduce(list.__add__, 
+                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+# factors = [factors(i) for i in range(MAX)]
+
+# factorial and inverse factorial
+
 # fact = [1]*MAX
 # invfact = [1]*MAX
 # for i in range(1,MAX):
 #     fact[i] = (fact[i-1]*i)%MOD
 #     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
 
+# recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
 def bootstrap(f):  
     stack = []
     def wrappedfunc(*args, **kwargs):
@@ -139,40 +149,8 @@ def bootstrap(f):
 
 ###############################################################################
 
-
 def solve():
-    n = int(input())
-    mapp = defaultdict(list)
-    for i in range(n-1):
-        a,b = map(int,input().split())
-        mapp[a].append(b)
-        mapp[b].append(a)
-    q = int(input())
-    queries = []
-    for i in range(q):
-        a,b = map(int,input().split())
-        queries.append((a,b))
-    ans_mapp = {}
-
-    @bootstrap
-    def dfs(node, parent = None):
-        leaf_nodes = 0
-        child_count = 0
-        for child in mapp[node]:
-            if child!=parent:
-                child_count += 1
-                leaf_nodes += (yield dfs(child,node))
-        if child_count == 0:
-            leaf_nodes = 1
-        ans_mapp[Wrapper(node)] = leaf_nodes
-        yield leaf_nodes
-
-    dfs(1)
-
-    for a,b in queries:
-        print(ans_mapp[Wrapper(a)]*ans_mapp[Wrapper(b)])
-
-
+    pass
 
 ###############################################################################
 

@@ -83,25 +83,17 @@ def ncr(n, r, p):
 def case(t):
     print("Case #{}:".format(t), end=" ")
 
-# For codeforces - hashing function 
+# For codeforces - hashmap to avoid TLE
 RANDOM = random.randrange(2**62)
 def mapping_wrapper(x):
   return x ^ RANDOM
 
-class hash_map(dict):
+class HashMap(dict):
     def __setitem__(self, key, value):
         super().__setitem__(mapping_wrapper(key), value)
     def __getitem__(self, key):
         return super().__getitem__(mapping_wrapper(key))
 
-def factors(n): 
-    if n==0:
-        return set()   
-    return set(reduce(list.__add__, 
-                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
-
-# MAX = 10**5+5
-# factors = [factors(i) for i in range(MAX)]
 
 MOD = 10**9 + 7
 
@@ -119,13 +111,24 @@ def mod_inverse(a):
 
 MAX = 2*(10**5)+5
 
+def factors(n): 
+    if n==0:
+        return set()   
+    return set(reduce(list.__add__, 
+                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+# factors = [factors(i) for i in range(MAX)]
+
+# factorial and inverse factorial
+
 # fact = [1]*MAX
 # invfact = [1]*MAX
 # for i in range(1,MAX):
 #     fact[i] = (fact[i-1]*i)%MOD
 #     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
 
-def bootstrap(f):  # change 'return' to 'yield' and add 'yield' before calling the function
+# recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
+def bootstrap(f):  
     stack = []
     def wrappedfunc(*args, **kwargs):
         if stack:
