@@ -93,6 +93,8 @@ class HashMap(dict):
         super().__setitem__(mapping_wrapper(key), value)
     def __getitem__(self, key):
         return super().__getitem__(mapping_wrapper(key))
+    def __contains__(self, key):
+        return super().__contains__(mapping_wrapper(key))
 
 
 MOD = 10**9 + 7
