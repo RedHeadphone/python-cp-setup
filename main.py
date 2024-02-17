@@ -9,8 +9,8 @@ import sys,os
 
 input = lambda : sys.stdin.readline().strip()
 
-debug = lambda **x: 0
-if os.environ.get('LOCAL_DEV'): debug = lambda **x: [print(i,':', x[i], file=sys.stderr) for i in x]
+debug = lambda *x,**y: 0
+if os.environ.get('LOCAL_DEV'): debug = lambda *x,**y: print(*x,y, file=sys.stderr)
 
 
 class SegmentTree:
