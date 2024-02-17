@@ -5,9 +5,13 @@ from heapq import heapify, heappush, heappop
 from functools import lru_cache, reduce
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
-import sys
+import sys,os
 
 input = lambda : sys.stdin.readline().strip()
+
+debug = lambda *x,**y: 0
+if os.environ.get('LOCAL_DEV'): debug = lambda *x,**y: print(*x,y, file=sys.stderr)
+
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
