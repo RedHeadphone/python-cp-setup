@@ -2,7 +2,7 @@ import random
 import math
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
-from functools import lru_cache, reduce
+from functools import cache, reduce
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
 import sys,os
@@ -155,11 +155,11 @@ def bootstrap(f):
 
 ###############################################################################
 
-def solve():
+def solve(case):
     pass
 
 ###############################################################################
 
 for t in range(int(input())):
     # case(t+1)
-    solve()
+    solve(t+1)
