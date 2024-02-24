@@ -2,12 +2,16 @@ import random
 import math
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
-from functools import lru_cache, reduce
+from functools import cache, reduce
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
-import sys
+import sys,os
 
 input = lambda : sys.stdin.readline().strip()
+
+debug = lambda *x,**y: 0
+if os.environ.get('LOCAL_DEV'): debug = lambda *x,**y: print(*x,y, file=sys.stderr)
+
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -151,11 +155,11 @@ def bootstrap(f):
 
 ###############################################################################
 
-def solve():
+def solve(case=None):
     pass
 
 ###############################################################################
 
 for t in range(int(input())):
     # case(t+1)
-    solve()
+    solve(t+1)
