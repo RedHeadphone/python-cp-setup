@@ -227,6 +227,19 @@ class RollingHash:
         self.hash =  (self.hash + self.func(char) * pow(self.base, self.length, MOD)) % MOD
         self.length += 1
 
+def prime_factors(n):
+    factors = []
+    divisor = 2
+    while divisor * divisor <= n:
+        power = 0
+        while n % divisor == 0:
+            n //= divisor
+            power += 1
+        if power > 0: factors.append((divisor, power))
+        divisor += 1
+    if n > 1: factors.append((n, 1))
+    return factors
+
 
 ###############################################################################
 
