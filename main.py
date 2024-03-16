@@ -167,6 +167,67 @@ def binary_search(left,right,check,ans):
 
 binn = lambda num: bin(num)[2:]
 
+class lazyheap:
+    def __init__(self):
+        self.heap = []  
+        self.count = 0   
+        self.sum = 0 
+        self.toremove = Counter()
+    
+    def push(self, item):
+        heappush(self.heap, item)
+        self.count += 1
+        self.sum += item
+ 
+    def remove(self, item):
+        self.toremove[item] += 1    
+        self.count -= 1
+        self.sum -= item
+ 
+    def top(self):
+        x = self.heap[0]
+        while self.toremove[x] > 0:
+            self.toremove[x] -= 1
+            heappop(self.heap)
+            x = self.heap[0]
+        return x
+ 
+    def pop(self):
+        x = self.top()
+        heappop(self.heap)
+        self.count -= 1
+        self.sum -= x
+        return x
+
+def bit_sum(num):
+    b = len(binn(num))
+    bs = [0] * b
+    c = 2**b - 1
+    for i in range(b):
+        c -= (1<<i)
+        bs[i] = (num & c) // 2
+        if num & ((1<<i)):
+            bs[i] += (num % (1<<i)) + 1
+    return bs
+
+class RollingHash:
+    def __init__(self, base = 256, string = "", func = ord):
+        self.base = base
+        self.hash = 0
+        self.length = 0
+        self.func = func
+        for i in string:
+            self.left_add(i)
+
+    def left_add(self, char):
+        self.hash =  (self.hash * self.base + self.func(char)) % MOD
+        self.length += 1
+    
+    def right_add(self, char):
+        self.hash =  (self.hash + self.func(char) * pow(self.base, self.length, MOD)) % MOD
+        self.length += 1
+
+
 ###############################################################################
 
 def solve(case=None):
