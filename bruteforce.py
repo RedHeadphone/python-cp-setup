@@ -52,18 +52,24 @@ class UnionFind:
         self.n = n
         self.parents = list(range(n))
         self.count = [1]*n
+        self.sets_count = n
+
     def find(self, x):
-        if self.parents[x] == x:
-            return x
-        else:
-            self.parents[x] = self.find(self.parents[x])
-            return self.parents[x]
+        x_copy = x
+        while self.parents[x] != x:
+            x = self.parents[x]
+        while x_copy != x:
+            x_copy, self.parents[x_copy] = self.parents[x_copy], x
+        return x
+        
     def union(self, x, y):
-        x = self.find(x)
-        y = self.find(y)
+        x, y = self.find(x), self.find(y)
         if x != y:
-            self.parents[x] = y
-            self.count[y] += self.count[x]
+            if self.count[x] < self.count[y]:
+                x, y = y, x
+            self.parents[y] = x
+            self.count[x] += self.count[y]
+            self.sets_count -= 1
 
 dire = [0,1,0,-1,0]
 
