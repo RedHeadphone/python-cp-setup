@@ -1,11 +1,10 @@
-import random
-import math
+import sys, os, random, math
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
 from functools import cache, reduce
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
-import sys,os
+from typing import *
 
 input = lambda : sys.stdin.readline().strip()
 
@@ -84,9 +83,6 @@ def ncr(n, r, p):
     return (num * pow(den,
             p - 2, p)) % p
 
-def case(t):
-    print("Case #{}:".format(t), end=" ")
-
 # For codeforces - hashmap to avoid TLE
 RANDOM = random.randrange(2**62)
 def mapping_wrapper(x):
@@ -153,6 +149,24 @@ def bootstrap(f):
             return to
     return wrappedfunc
 
+def binary_search(left,right,check,ans):
+    minimum_ans = (ans == left)
+    while left<=right:
+        mid = (left+right)//2
+        if minimum_ans:
+            if check(mid):
+                ans,left = mid, mid+1
+            else:
+                right = mid-1
+        else:
+            if check(mid):
+                ans,right = mid, mid-1
+            else:
+                left = mid+1
+    return ans
+
+binn = lambda num: bin(num)[2:]
+
 ###############################################################################
 
 def solve(case=None):
@@ -160,6 +174,7 @@ def solve(case=None):
 
 ###############################################################################
 
-for t in range(int(input())):
-    # case(t+1)
+test_cases = int(input())
+# test_cases = 1
+for t in range(test_cases):
     solve(t+1)
