@@ -89,19 +89,44 @@ def ncr(n, r, p):
     return (num * pow(den,
             p - 2, p)) % p
 
-# For codeforces - hashmap to avoid TLE
-RANDOM = random.randrange(2**62)
-def mapping_wrapper(x):
-  return x ^ RANDOM
-
-class HashMap(dict):
+# Custom HashMap and Set for Anti-hash-table test
+class CustomHashMap:
+    def __init__(self, *args, **kwargs):
+        self.RANDOM = random.randrange(2**62)
+        self.dict = dict(*args, **kwargs)
+    def wrapper(self,num):
+        return num ^ self.RANDOM
     def __setitem__(self, key, value):
-        super().__setitem__(mapping_wrapper(key), value)
+        self.dict[self.wrapper(key)] = value
     def __getitem__(self, key):
-        return super().__getitem__(mapping_wrapper(key))
+        return self.dict[self.wrapper(key)]
     def __contains__(self, key):
-        return super().__contains__(mapping_wrapper(key))
+        return self.wrapper(key) in self.dict
+    def __iter__(self):
+        return iter(self.wrapper(i) for i in self.dict)
+    def items(self):
+        return [(self.wrapper(i),j) for i,j in self.dict.items()]
+    def __repr__(self):
+        return repr({self.wrapper(i):j for i,j in self.dict.items()})
 
+class CustomSet:
+    def __init__(self, *args, **kwargs):
+        self.RANDOM = random.randrange(2**62)
+        self.set = set(*args, **kwargs)
+    def wrapper(self,num):
+        return num ^ self.RANDOM
+    def add(self, key):
+        self.set.add(self.wrapper(key))
+    def remove(self, key):
+        self.set.remove(self.wrapper(key))
+    def __contains__(self, key):
+        return self.wrapper(key) in self.set
+    def __iter__(self):
+        return iter(self.wrapper(i) for i in self.set)
+    def __len__(self):
+        return len(self.set)
+    def __repr__(self):
+        return repr({self.wrapper(i) for i in self.set})
 
 MOD = 10**9 + 7
 
