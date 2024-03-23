@@ -1,4 +1,5 @@
-import sys, os, random, math
+import sys, os, random, math, string
+from itertools import accumulate, product
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
 from functools import cache, reduce
@@ -159,6 +160,12 @@ def factors(n):
 # for i in range(1,MAX):
 #     fact[i] = (fact[i-1]*i)%MOD
 #     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
+
+# prime = [True]*MAX
+# for i in range(2,MAX):
+#     if prime[i]:
+#         for j in range(i*i,MAX,i):
+#             prime[j] = False
 
 # recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
 def bootstrap(f):  
