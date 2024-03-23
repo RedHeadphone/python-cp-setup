@@ -286,7 +286,8 @@ def solve(case=None):
 
 ###############################################################################
 
-test_cases = int(input())
-# test_cases = 1
-for t in range(test_cases):
-    solve(t+1)
+multiple_cases = True
+Y,N = 'YES','NO'
+
+test_cases = 1 if not multiple_cases else int(input())
+for t in range(test_cases): solve(t+1)
