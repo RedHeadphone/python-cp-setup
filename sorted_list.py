@@ -1,6 +1,5 @@
 
-from bisect import bisect_left as lower_bound
-from bisect import bisect_right as upper_bound
+from bisect import bisect_left, bisect_right
 
 
 class FenwickTree:
@@ -47,11 +46,11 @@ class SortedList:
         self.fenwick = FenwickTree([0])
         self.size = 0
         for item in iterable:
-            self.insert(item)
+            self.add(item)
 
-    def insert(self, x):
-        i = lower_bound(self.macro, x)
-        j = upper_bound(self.micros[i], x)
+    def add(self, x):
+        i = bisect_left(self.macro, x)
+        j = bisect_right(self.micros[i], x)
         self.micros[i].insert(j, x)
         self.size += 1
         self.micro_size[i] += 1
@@ -69,23 +68,28 @@ class SortedList:
         self.fenwick.update(i, -1)
         return self.micros[i].pop(j)
 
+    def remove(self, x):
+        c = self.count(x)
+        ind = self.bisect_left(x)
+        for _ in range(c): self.pop(ind)
+
     def __getitem__(self, k):
         i, j = self._find_kth(k)
         return self.micros[i][j]
 
     def count(self, x):
-        return self.upper_bound(x) - self.lower_bound(x)
+        return self.bisect_right(x) - self.bisect_left(x)
 
     def __contains__(self, x):
         return self.count(x) > 0
 
-    def lower_bound(self, x):
-        i = lower_bound(self.macro, x)
-        return self.fenwick(i) + lower_bound(self.micros[i], x)
+    def bisect_left(self, x):
+        i = bisect_left(self.macro, x)
+        return self.fenwick(i) + bisect_left(self.micros[i], x)
 
-    def upper_bound(self, x):
-        i = upper_bound(self.macro, x)
-        return self.fenwick(i) + upper_bound(self.micros[i], x)
+    def bisect_right(self, x):
+        i = bisect_right(self.macro, x)
+        return self.fenwick(i) + bisect_right(self.micros[i], x)
 
     def _find_kth(self, k):
         return self.fenwick.find_kth(k + self.size if k < 0 else k)
