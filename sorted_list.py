@@ -2,28 +2,39 @@
 from bisect import bisect_left, bisect_right
 
 
-class FenwickTree:
-    def __init__(self, x):
-        bit = self.bit = list(x)
+class SortedList:
+    block_size = 700
+
+    def __init__(self, iterable=()):
+        self.macro = []
+        self.micros = [[]]
+        self.micro_size = [0]
+        self.ft_build()
+        self.size = 0
+        for item in iterable:
+            self.add(item)
+    
+    def ft_build(self):
+        bit = self.bit = list(self.micro_size)
         bit_size = self.bit_size = len(bit)
         for i in range(bit_size):
             j = i | (i + 1)
             if j < bit_size:
                 bit[j] += bit[i]
 
-    def update(self, idx, x):
+    def ft_update(self, idx, x):
         while idx < self.bit_size:
             self.bit[idx] += x
             idx |= idx + 1
 
-    def __call__(self, end):
+    def ft_get(self, end):
         x = 0
         while end:
             x += self.bit[end - 1]
             end &= end - 1
         return x
 
-    def find_kth(self, k):
+    def ft_find_kth(self, k):
         idx = -1
         for d in reversed(range(self.bit_size.bit_length())):
             right_idx = idx + (1 << d)
@@ -32,37 +43,24 @@ class FenwickTree:
                 k -= self.bit[idx]
         return idx + 1, k
 
-
-class SortedList:
-    block_size = 700
-
-    def __init__(self, iterable=()):
-        self.macro = []
-        self.micros = [[]]
-        self.micro_size = [0]
-        self.fenwick = FenwickTree([0])
-        self.size = 0
-        for item in iterable:
-            self.add(item)
-
     def add(self, x):
         i = bisect_left(self.macro, x)
         j = bisect_right(self.micros[i], x)
         self.micros[i].insert(j, x)
         self.size += 1
         self.micro_size[i] += 1
-        self.fenwick.update(i, 1)
+        self.ft_update(i, 1)
         if len(self.micros[i]) >= self.block_size:
             self.micros[i:i + 1] = self.micros[i][:self.block_size >> 1], self.micros[i][self.block_size >> 1:]
             self.micro_size[i:i + 1] = self.block_size >> 1, self.block_size >> 1
-            self.fenwick = FenwickTree(self.micro_size)
+            self.ft_build()
             self.macro.insert(i, self.micros[i + 1][0])
 
     def pop(self, k=-1):
         i, j = self._find_kth(k)
         self.size -= 1
         self.micro_size[i] -= 1
-        self.fenwick.update(i, -1)
+        self.ft_update(i, -1)
         return self.micros[i].pop(j)
 
     def remove(self, x):
@@ -82,14 +80,14 @@ class SortedList:
 
     def bisect_left(self, x):
         i = bisect_left(self.macro, x)
-        return self.fenwick(i) + bisect_left(self.micros[i], x)
+        return self.ft_get(i) + bisect_left(self.micros[i], x)
 
     def bisect_right(self, x):
         i = bisect_right(self.macro, x)
-        return self.fenwick(i) + bisect_right(self.micros[i], x)
+        return self.ft_get(i) + bisect_right(self.micros[i], x)
 
     def _find_kth(self, k):
-        return self.fenwick.find_kth(k + self.size if k < 0 else k)
+        return self.ft_find_kth(k + self.size if k < 0 else k)
 
     def __len__(self):
         return self.size
