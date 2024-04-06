@@ -10,9 +10,10 @@ from typing import *
 
 input = lambda : sys.stdin.readline().strip()
 
-debug = lambda *x,**y: 0
-if os.environ.get('LOCAL_DEV'): debug = lambda *x,**y: print(*x,y, file=sys.stderr)
-
+def debug(*x,**y):
+    global debug_enabled
+    if not debug_enabled: return
+    print(*x,y, file=sys.stderr)
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -287,7 +288,8 @@ def solve(case=None):
 
 ###############################################################################
 
-multiple_cases = True
+multiple_cases = 1
+debug_enabled = 0
 Y,N = 'YES','NO'
 
 test_cases = 1 if not multiple_cases else int(input())
