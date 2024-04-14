@@ -10,9 +10,10 @@ from typing import *
 
 input = lambda : sys.stdin.readline().strip()
 
-debug = lambda *x,**y: 0
-if os.environ.get('LOCAL_DEV'): debug = lambda *x,**y: print(*x,y, file=sys.stderr)
-
+def debug(*x,**y):
+    global debug_enabled
+    if not debug_enabled: return
+    print(*x,y, file=sys.stderr)
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -93,9 +94,10 @@ def ncr(n, r, p):
 
 # Custom HashMap and Set for Anti-hash-table test
 class CustomHashMap:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, type = dict, arr = [], func = None):
         self.RANDOM = random.randrange(2**62)
-        self.dict = dict(*args, **kwargs)
+        if func==None: self.dict = type([self.wrapper(i) for i in arr])
+        else: self.dict = type(func)
     def wrapper(self,num):
         return num ^ self.RANDOM
     def __setitem__(self, key, value):
@@ -106,15 +108,19 @@ class CustomHashMap:
         return self.wrapper(key) in self.dict
     def __iter__(self):
         return iter(self.wrapper(i) for i in self.dict)
+    def keys(self):
+        return [self.wrapper(i) for i in self.dict]
+    def values(self):
+        return [i for i in self.dict.values()]
     def items(self):
         return [(self.wrapper(i),j) for i,j in self.dict.items()]
     def __repr__(self):
         return repr({self.wrapper(i):j for i,j in self.dict.items()})
 
 class CustomSet:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, arr = []):
         self.RANDOM = random.randrange(2**62)
-        self.set = set(*args, **kwargs)
+        self.set = set(arr)
     def wrapper(self,num):
         return num ^ self.RANDOM
     def add(self, key):
@@ -287,7 +293,8 @@ def solve(case=None):
 
 ###############################################################################
 
-multiple_cases = True
+multiple_cases = 1
+debug_enabled = 0
 Y,N = 'YES','NO'
 
 test_cases = 1 if not multiple_cases else int(input())
