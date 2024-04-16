@@ -210,7 +210,9 @@ def binary_search(left,right,check,ans):
                 left = mid+1
     return ans
 
-binn = lambda num: bin(num)[2:]
+def binn(num,size=None):
+    bin_string = bin(num)[2:]
+    return bin_string if (size==None) else bin_string.zfill(size)
 
 class lazyheap:
     def __init__(self):
