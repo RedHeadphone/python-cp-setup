@@ -8,7 +8,7 @@
       "type": "shell",
       "command": [
         "export LOCAL_DEV=true;",
-        "python main.py < input.txt > output.txt;"
+        "python3.10 main.py < input.txt > output.txt;"
       ],
       "problemMatcher": []
     },
@@ -17,7 +17,7 @@
       "type": "shell",
       "command": [
         "export LOCAL_DEV=true;",
-        "python testcase_gen.py > input.txt;"
+        "python3.10 testcase_gen.py > input.txt;"
       ],
       "problemMatcher": []
     },
@@ -26,8 +26,8 @@
       "type": "shell",
       "command": [
         "export LOCAL_DEV=true;",
-        "python main.py < input.txt > output.txt;",
-        "python bruteforce.py < input.txt > output_bruteforce.txt;",
+        "python3.10 main.py < input.txt > output.txt;",
+        "python3.10 bruteforce.py < input.txt > output_bruteforce.txt;",
         "diff output.txt output_bruteforce.txt;"
       ],
       "problemMatcher": []
