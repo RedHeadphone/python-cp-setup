@@ -1,5 +1,4 @@
-import sys, os, random, math, string
-from itertools import accumulate, product
+import sys, os, random, math, string, itertools
 from copy import deepcopy
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop, nlargest, nsmallest
@@ -264,17 +263,30 @@ class RollingHash:
         self.length = 0
         self.func = func
         for i in string:
-            self.left_add(i)
+            self.right_add(i)
 
-    def left_add(self, char):
+    def right_add(self, char):
         self.hash =  (self.hash * self.base + self.func(char)) % MOD
         self.length += 1
     
-    def right_add(self, char):
+    def left_add(self, char):
         self.hash =  (self.hash + self.func(char) * pow(self.base, self.length, MOD)) % MOD
         self.length += 1
 
-def prime_factors(n):
+# last_prime_factor = [0]*MAX
+# for i in range(2, MAX):
+#     if last_prime_factor[i] > 0: continue
+#     for j in range(i, MAX, i):
+#         last_prime_factor[j] = i
+
+# def prime_factors(n):
+#     factors = set()
+#     while n > 1:
+#         factors.add(last_prime_factor[n])
+#         n //= last_prime_factor[n]
+#     return factors
+
+def prime_factors_with_power(n):
     factors = []
     divisor = 2
     while divisor * divisor <= n:
