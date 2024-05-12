@@ -14,6 +14,21 @@ def debug(*x,**y):
     print(*x,(y if y!={} else "\b"), file=sys.stderr)
 
 
+###############################################################################
+
+def solve(case=None):
+    pass
+
+
+MULTIPLE_CASES = 1
+DEBUG_ENABLED = 0
+BOOLEAN_RETURN = 0
+MOD = 10**9 + 7
+TRUE_MAPPING,FALSE_MAPPING = 'YES','NO'
+
+###############################################################################
+
+
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
         self.n = len(arr)
@@ -308,19 +323,6 @@ class Maths:
                 return False
         return True
 
-
-###############################################################################
-
-def solve(case=None):
-    pass
-
-###############################################################################
-
-MULTIPLE_CASES = 1
-DEBUG_ENABLED = 0
-BOOLEAN_RETURN = 0
-MOD = 10**9 + 7
-TRUE_MAPPING,FALSE_MAPPING = 'YES','NO'
 
 number_of_test_cases = 1 if not MULTIPLE_CASES else int(input())
 for t in range(number_of_test_cases):
