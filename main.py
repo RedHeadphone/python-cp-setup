@@ -1,7 +1,7 @@
-import sys, os, random, math, string, itertools
+import sys, random, math, string, itertools
 from copy import deepcopy
 from collections import defaultdict, Counter, deque, OrderedDict
-from heapq import heapify, heappush, heappop, nlargest, nsmallest
+from heapq import heapify, heappush, heappop
 from functools import cache, reduce
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
@@ -10,9 +10,9 @@ from typing import *
 input = lambda : sys.stdin.readline().strip()
 
 def debug(*x,**y):
-    global debug_enabled
-    if not debug_enabled: return
-    print(*x,y, file=sys.stderr)
+    if not DEBUG_ENABLED: return
+    print(*x,(y if y!={} else "\b"), file=sys.stderr)
+
 
 class SegmentTree:
     def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
@@ -20,11 +20,8 @@ class SegmentTree:
         self.segmentTree = [0]*self.n + arr
         self.func = func
         self.defaultvalue = defaultvalue
-        self.buildSegmentTree(arr)
-
-    def buildSegmentTree(self, arr) :   
         for i in range(self.n -1, 0, -1) :
-            self.segmentTree[i] = self.func(self.segmentTree[2*i] , self.segmentTree[2*i+1])         
+            self.segmentTree[i] = self.func(self.segmentTree[2*i] , self.segmentTree[2*i+1])
             
     def query(self, l, r) :
         l += self.n
@@ -73,30 +70,13 @@ class UnionFind:
             self.count[x] += self.count[y]
             self.sets_count -= 1
 
-dire = [0,1,0,-1,0]
 
-def is_prime(n):
-    if n==1:
-        return False
-    for i in range(2,int(n**0.5)+1):
-        if n%i==0:
-            return False
-    return True
-
-def ncr(n, r, p):
-    num = den = 1
-    for i in range(r):
-        num = (num * (n - i)) % p
-        den = (den * (i + 1)) % p
-    return (num * pow(den,
-            p - 2, p)) % p
-
-# Custom HashMap and Set for Anti-hash-table test
+# Custom HashMap and Set for Python's Anti-hash-table test
 class CustomHashMap:
-    def __init__(self, type = dict, arr = [], func = None):
+    def __init__(self, type = dict, arg = []): # allowed types: dict, defaultdict, Counter
         self.RANDOM = random.randrange(2**62)
-        if func==None: self.dict = type([self.wrapper(i) for i in arr])
-        else: self.dict = type(func)
+        if type != defaultdict: self.dict = type([self.wrapper(i) for i in arg])
+        else: self.dict = type(arg) # arg should be function
     def wrapper(self,num):
         return num ^ self.RANDOM
     def __setitem__(self, key, value):
@@ -119,7 +99,7 @@ class CustomHashMap:
 class CustomSet:
     def __init__(self, arr = []):
         self.RANDOM = random.randrange(2**62)
-        self.set = set(arr)
+        self.set = set([self.wrapper(i) for i in arr])
     def wrapper(self,num):
         return num ^ self.RANDOM
     def add(self, key):
@@ -135,43 +115,57 @@ class CustomSet:
     def __repr__(self):
         return repr({self.wrapper(i) for i in self.set})
 
-MOD = 10**9 + 7
 
-def binpow(a, b):
-    if b==0:
-        return 1
-    res = binpow(a,b//2)
-    res = pow(res,2,MOD)
-    if b%2:
-        return (res*a)%MOD
-    return res
+class lazyheap:
+    def __init__(self):
+        self.heap = []  
+        self.count = 0   
+        self.sum = 0 
+        self.toremove = Counter()
 
-def mod_inverse(a):
-    return binpow(a,MOD-2)
+    def push(self, item):
+        heappush(self.heap, item)
+        self.count += 1
+        self.sum += item
 
-MAX = 2*(10**5)+5
+    def remove(self, item):
+        self.toremove[item] += 1    
+        self.count -= 1
+        self.sum -= item
 
-def factors(n): 
-    if n==0:
-        return set()   
-    return set(reduce(list.__add__, 
-                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+    def top(self):
+        x = self.heap[0]
+        while self.toremove[x] > 0:
+            self.toremove[x] -= 1
+            heappop(self.heap)
+            x = self.heap[0]
+        return x
+    
+    def pop(self):
+        x = self.top()
+        heappop(self.heap)
+        self.count -= 1
+        self.sum -= x
+        return x
 
-# factors = [factors(i) for i in range(MAX)]
 
-# factorial and inverse factorial
+class RollingHash:
+    def __init__(self, base = 256, string = "", func = ord):
+        self.base = base
+        self.hash = 0
+        self.length = 0
+        self.func = func
+        for i in string:
+            self.right_add(i)
 
-# fact = [1]*MAX
-# invfact = [1]*MAX
-# for i in range(1,MAX):
-#     fact[i] = (fact[i-1]*i)%MOD
-#     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
+    def right_add(self, char):
+        self.hash =  (self.hash * self.base + self.func(char)) % MOD
+        self.length += 1
+    
+    def left_add(self, char):
+        self.hash =  (self.hash + self.func(char) * pow(self.base, self.length, MOD)) % MOD
+        self.length += 1
 
-# prime = [True]*MAX
-# for i in range(2,MAX):
-#     if prime[i]:
-#         for j in range(i*i,MAX,i):
-#             prime[j] = False
 
 # recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
 def bootstrap(f):  
@@ -193,11 +187,13 @@ def bootstrap(f):
             return to
     return wrappedfunc
 
-def binary_search(left,right,check,ans):
-    minimum_ans = (ans == left)
+
+def binary_search(left,right,check,start_from_left):
+    if start_from_left: ans = left 
+    else: ans = right
     while left<=right:
         mid = (left+right)//2
-        if minimum_ans:
+        if start_from_left:
             if check(mid):
                 ans,left = mid, mid+1
             else:
@@ -209,95 +205,103 @@ def binary_search(left,right,check,ans):
                 left = mid+1
     return ans
 
-def binn(num,size=None):
-    bin_string = bin(num)[2:]
-    return bin_string if (size==None) else bin_string.zfill(size)
 
-class lazyheap:
-    def __init__(self):
-        self.heap = []  
-        self.count = 0   
-        self.sum = 0 
-        self.toremove = Counter()
+class BitManipulation:
+    def bin(self,num,size=None):
+        bin_string = bin(num)[2:]
+        return bin_string if (size==None) else bin_string.zfill(size)
+
+    def bit_sum(self,num): # returns array of sum of bits of all numbers from 0 to num
+        b = len(self.bin(num))
+        bs = [0] * b
+        c = 2**b - 1
+        for i in range(b):
+            c -= (1<<i)
+            bs[i] = (num & c) // 2
+            if num & ((1<<i)):
+                bs[i] += (num % (1<<i)) + 1
+        return bs
     
-    def push(self, item):
-        heappush(self.heap, item)
-        self.count += 1
-        self.sum += item
- 
-    def remove(self, item):
-        self.toremove[item] += 1    
-        self.count -= 1
-        self.sum -= item
- 
-    def top(self):
-        x = self.heap[0]
-        while self.toremove[x] > 0:
-            self.toremove[x] -= 1
-            heappop(self.heap)
-            x = self.heap[0]
-        return x
- 
-    def pop(self):
-        x = self.top()
-        heappop(self.heap)
-        self.count -= 1
-        self.sum -= x
-        return x
 
-def bit_sum(num):
-    b = len(binn(num))
-    bs = [0] * b
-    c = 2**b - 1
-    for i in range(b):
-        c -= (1<<i)
-        bs[i] = (num & c) // 2
-        if num & ((1<<i)):
-            bs[i] += (num % (1<<i)) + 1
-    return bs
+class Maths:
+    def __init__(self, fact_memo=False, lpf_memo=False, max_n=(2*(10**5)+5)):
+        if fact_memo:
+            fact = [1]*max_n
+            invfact = [1]*max_n
+            for i in range(1,max_n):
+                fact[i] = (fact[i-1]*i)%MOD
+                invfact[i] = (invfact[i-1]*self.mod_inverse(i))%MOD
+            self.fact = fact
+            self.invfact = invfact
+        
+        if lpf_memo:
+            last_prime_factor = [0]*max_n
+            for i in range(2, max_n):
+                if last_prime_factor[i] > 0: continue
+                for j in range(i, max_n, i):
+                    last_prime_factor[j] = i
+            self.last_prime_factor = last_prime_factor
 
-class RollingHash:
-    def __init__(self, base = 256, string = "", func = ord):
-        self.base = base
-        self.hash = 0
-        self.length = 0
-        self.func = func
-        for i in string:
-            self.right_add(i)
+    def ncr(self,n, r):
+        if n < r: return 0
+        return (self.fact[n]*self.invfact[r]*self.invfact[n-r])%MOD
 
-    def right_add(self, char):
-        self.hash =  (self.hash * self.base + self.func(char)) % MOD
-        self.length += 1
-    
-    def left_add(self, char):
-        self.hash =  (self.hash + self.func(char) * pow(self.base, self.length, MOD)) % MOD
-        self.length += 1
+    def npr(self,n, r):
+        if n < r: return 0
+        return (self.fact[n]*self.invfact[n-r])%MOD
 
-# last_prime_factor = [0]*MAX
-# for i in range(2, MAX):
-#     if last_prime_factor[i] > 0: continue
-#     for j in range(i, MAX, i):
-#         last_prime_factor[j] = i
+    def mod_inverse(self,a):
+        return pow(a,MOD-2,MOD)
 
-# def prime_factors(n):
-#     factors = set()
-#     while n > 1:
-#         factors.add(last_prime_factor[n])
-#         n //= last_prime_factor[n]
-#     return factors
+    def ncr_without_memo(self,n, r):
+        if n < r: return 0
+        num = den = 1
+        for i in range(r):
+            num = (num * (n - i)) % MOD
+            den = (den * (i + 1)) % MOD
+        return (num * pow(den,
+                MOD - 2, MOD)) % MOD
 
-def prime_factors_with_power(n):
-    factors = []
-    divisor = 2
-    while divisor * divisor <= n:
-        power = 0
-        while n % divisor == 0:
-            n //= divisor
-            power += 1
-        if power > 0: factors.append((divisor, power))
-        divisor += 1
-    if n > 1: factors.append((n, 1))
-    return factors
+    def npr_without_memo(self,n, r):
+        if n < r: return 0
+        num = 1
+        for i in range(n,n-r,-1):
+            num = (num * i) % MOD
+        return num
+
+    def factors(self,n): 
+        if n==0:
+            return set()   
+        return set(reduce(list.__add__, 
+                    ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+    def prime_factors_using_lpf(self,n):
+        factors = set()
+        while n > 1:
+            factors.add(self.last_prime_factor[n])
+            n //= self.last_prime_factor[n]
+        return factors
+
+    def prime_factors_with_power(self,n):
+        factors = []
+        divisor = 2
+        while divisor * divisor <= n:
+            power = 0
+            while n % divisor == 0:
+                n //= divisor
+                power += 1
+            if power > 0: factors.append((divisor, power))
+            divisor += 1
+        if n > 1: factors.append((n, 1))
+        return factors
+
+    def is_prime(self,n):
+        if n==1:
+            return False
+        for i in range(2,int(n**0.5)+1):
+            if n%i==0:
+                return False
+        return True
 
 
 ###############################################################################
@@ -307,9 +311,13 @@ def solve(case=None):
 
 ###############################################################################
 
-multiple_cases = 1
-debug_enabled = 0
-Y,N = 'YES','NO'
+MULTIPLE_CASES = 1
+DEBUG_ENABLED = 0
+BOOLEAN_RETURN = 0
+MOD = 10**9 + 7
+TRUE_MAPPING,FALSE_MAPPING = 'YES','NO'
 
-test_cases = 1 if not multiple_cases else int(input())
-for t in range(test_cases): solve(t+1)
+number_of_test_cases = 1 if not MULTIPLE_CASES else int(input())
+for t in range(number_of_test_cases):
+    if BOOLEAN_RETURN: print(TRUE_MAPPING if solve(t+1) else FALSE_MAPPING)
+    else: solve(t+1)
