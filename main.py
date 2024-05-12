@@ -295,6 +295,11 @@ class Maths:
         if n > 1: factors.append((n, 1))
         return factors
 
+    def is_prime_using_lpf(self,n):
+        if n<2:
+            return False
+        return self.last_prime_factor[n] == n
+
     def is_prime(self,n):
         if n==1:
             return False
