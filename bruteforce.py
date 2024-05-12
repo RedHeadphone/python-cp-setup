@@ -1,59 +1,78 @@
-import sys, os, random, math, string, itertools
+import sys, random, math, string, itertools
 from copy import deepcopy
 from collections import defaultdict, Counter, deque, OrderedDict
-from heapq import heapify, heappush, heappop, nlargest, nsmallest
+from heapq import heapify, heappush, heappop
 from functools import cache, reduce
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
 from typing import *
 
-input = lambda : sys.stdin.readline().strip()
+input = lambda: sys.stdin.readline().strip()
 
-def debug(*x,**y):
-    global debug_enabled
-    if not debug_enabled: return
-    print(*x,y, file=sys.stderr)
+
+def debug(*x, **y):
+    if not DEBUG_ENABLED:
+        return
+    print(*x, (y if y != {} else "\b"), file=sys.stderr)
+
+
+###############################################################################
+
+
+def solve(case=None):
+    pass
+
+
+MULTIPLE_CASES = 1
+DEBUG_ENABLED = 0
+BOOLEAN_RETURN = 0
+MOD = 10**9 + 7
+TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
+
+###############################################################################
+
 
 class SegmentTree:
-    def __init__(self, arr, func = lambda x, y : x + y, defaultvalue = 0) :
+    def __init__(self, arr, func=lambda x, y: x + y, defaultvalue=0):
         self.n = len(arr)
-        self.segmentTree = [0]*self.n + arr
+        self.segmentTree = [0] * self.n + arr
         self.func = func
         self.defaultvalue = defaultvalue
-        self.buildSegmentTree(arr)
+        for i in range(self.n - 1, 0, -1):
+            self.segmentTree[i] = self.func(
+                self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
+            )
 
-    def buildSegmentTree(self, arr) :   
-        for i in range(self.n -1, 0, -1) :
-            self.segmentTree[i] = self.func(self.segmentTree[2*i] , self.segmentTree[2*i+1])         
-            
-    def query(self, l, r) :
+    def query(self, l, r):
         l += self.n
         r += self.n
         res = self.defaultvalue
-        while l < r :
-            if l & 1 :   
+        while l < r:
+            if l & 1:
                 res = self.func(res, self.segmentTree[l])
                 l += 1
             l >>= 1
-            if r & 1 :  
-                r -= 1      
-                res = self.func(res, self.segmentTree[r]) 
+            if r & 1:
+                r -= 1
+                res = self.func(res, self.segmentTree[r])
             r >>= 1
         return res
 
-    def update(self, i, value) :
+    def update(self, i, value):
         i += self.n
-        self.segmentTree[i] = value  
-        while i > 1 :
-            i >>= 1         
-            self.segmentTree[i] = self.func(self.segmentTree[2*i] , self.segmentTree[2*i+1])
+        self.segmentTree[i] = value
+        while i > 1:
+            i >>= 1
+            self.segmentTree[i] = self.func(
+                self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
+            )
 
 
 class UnionFind:
     def __init__(self, n):
         self.n = n
         self.parents = list(range(n))
-        self.count = [1]*n
+        self.count = [1] * n
         self.sets_count = n
 
     def find(self, x):
@@ -63,7 +82,7 @@ class UnionFind:
         while x_copy != x:
             x_copy, self.parents[x_copy] = self.parents[x_copy], x
         return x
-        
+
     def union(self, x, y):
         x, y = self.find(x), self.find(y)
         if x != y:
@@ -73,109 +92,128 @@ class UnionFind:
             self.count[x] += self.count[y]
             self.sets_count -= 1
 
-dire = [0,1,0,-1,0]
 
-def is_prime(n):
-    if n==1:
-        return False
-    for i in range(2,int(n**0.5)+1):
-        if n%i==0:
-            return False
-    return True
-
-def ncr(n, r, p):
-    num = den = 1
-    for i in range(r):
-        num = (num * (n - i)) % p
-        den = (den * (i + 1)) % p
-    return (num * pow(den,
-            p - 2, p)) % p
-
-# Custom HashMap and Set for Anti-hash-table test
+# Custom HashMap and Set for Python's Anti-hash-table test
 class CustomHashMap:
-    def __init__(self, type = dict, arr = [], func = None):
+    def __init__(self, type=dict, arg=[]):  # allowed types: dict, defaultdict, Counter
         self.RANDOM = random.randrange(2**62)
-        if func==None: self.dict = type([self.wrapper(i) for i in arr])
-        else: self.dict = type(func)
-    def wrapper(self,num):
+        if type != defaultdict:
+            self.dict = type([self.wrapper(i) for i in arg])
+        else:
+            self.dict = type(arg)  # arg should be function
+
+    def wrapper(self, num):
         return num ^ self.RANDOM
+
     def __setitem__(self, key, value):
         self.dict[self.wrapper(key)] = value
+
     def __getitem__(self, key):
         return self.dict[self.wrapper(key)]
+
     def __contains__(self, key):
         return self.wrapper(key) in self.dict
+
     def __iter__(self):
         return iter(self.wrapper(i) for i in self.dict)
+
     def keys(self):
         return [self.wrapper(i) for i in self.dict]
+
     def values(self):
         return [i for i in self.dict.values()]
+
     def items(self):
-        return [(self.wrapper(i),j) for i,j in self.dict.items()]
+        return [(self.wrapper(i), j) for i, j in self.dict.items()]
+
     def __repr__(self):
-        return repr({self.wrapper(i):j for i,j in self.dict.items()})
+        return repr({self.wrapper(i): j for i, j in self.dict.items()})
+
 
 class CustomSet:
-    def __init__(self, arr = []):
+    def __init__(self, arr=[]):
         self.RANDOM = random.randrange(2**62)
-        self.set = set(arr)
-    def wrapper(self,num):
+        self.set = set([self.wrapper(i) for i in arr])
+
+    def wrapper(self, num):
         return num ^ self.RANDOM
+
     def add(self, key):
         self.set.add(self.wrapper(key))
+
     def remove(self, key):
         self.set.remove(self.wrapper(key))
+
     def __contains__(self, key):
         return self.wrapper(key) in self.set
+
     def __iter__(self):
         return iter(self.wrapper(i) for i in self.set)
+
     def __len__(self):
         return len(self.set)
+
     def __repr__(self):
         return repr({self.wrapper(i) for i in self.set})
 
-MOD = 10**9 + 7
 
-def binpow(a, b):
-    if b==0:
-        return 1
-    res = binpow(a,b//2)
-    res = pow(res,2,MOD)
-    if b%2:
-        return (res*a)%MOD
-    return res
+class lazyheap:
+    def __init__(self):
+        self.heap = []
+        self.count = 0
+        self.sum = 0
+        self.toremove = Counter()
 
-def mod_inverse(a):
-    return binpow(a,MOD-2)
+    def push(self, item):
+        heappush(self.heap, item)
+        self.count += 1
+        self.sum += item
 
-MAX = 2*(10**5)+5
+    def remove(self, item):
+        self.toremove[item] += 1
+        self.count -= 1
+        self.sum -= item
 
-def factors(n): 
-    if n==0:
-        return set()   
-    return set(reduce(list.__add__, 
-                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+    def top(self):
+        x = self.heap[0]
+        while self.toremove[x] > 0:
+            self.toremove[x] -= 1
+            heappop(self.heap)
+            x = self.heap[0]
+        return x
 
-# factors = [factors(i) for i in range(MAX)]
+    def pop(self):
+        x = self.top()
+        heappop(self.heap)
+        self.count -= 1
+        self.sum -= x
+        return x
 
-# factorial and inverse factorial
 
-# fact = [1]*MAX
-# invfact = [1]*MAX
-# for i in range(1,MAX):
-#     fact[i] = (fact[i-1]*i)%MOD
-#     invfact[i] = (invfact[i-1]*mod_inverse(i))%MOD
+class RollingHash:
+    def __init__(self, base=256, string="", func=ord):
+        self.base = base
+        self.hash = 0
+        self.length = 0
+        self.func = func
+        for i in string:
+            self.right_add(i)
 
-# prime = [True]*MAX
-# for i in range(2,MAX):
-#     if prime[i]:
-#         for j in range(i*i,MAX,i):
-#             prime[j] = False
+    def right_add(self, char):
+        self.hash = (self.hash * self.base + self.func(char)) % MOD
+        self.length += 1
+
+    def left_add(self, char):
+        self.hash = (
+            self.hash + self.func(char) * pow(self.base, self.length, MOD)
+        ) % MOD
+        self.length += 1
+
 
 # recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
-def bootstrap(f):  
+def bootstrap(f):
     stack = []
+
     def wrappedfunc(*args, **kwargs):
         if stack:
             return f(*args, **kwargs)
@@ -191,125 +229,247 @@ def bootstrap(f):
                         break
                     to = stack[-1].send(to)
             return to
+
     return wrappedfunc
 
-def binary_search(left,right,check,ans):
-    minimum_ans = (ans == left)
-    while left<=right:
-        mid = (left+right)//2
-        if minimum_ans:
+
+def binary_search(left, right, check, start_from_left):
+    if start_from_left:
+        ans = left
+    else:
+        ans = right
+    while left <= right:
+        mid = (left + right) // 2
+        if start_from_left:
             if check(mid):
-                ans,left = mid, mid+1
+                ans, left = mid, mid + 1
             else:
-                right = mid-1
+                right = mid - 1
         else:
             if check(mid):
-                ans,right = mid, mid-1
+                ans, right = mid, mid - 1
             else:
-                left = mid+1
+                left = mid + 1
     return ans
 
-def binn(num,size=None):
-    bin_string = bin(num)[2:]
-    return bin_string if (size==None) else bin_string.zfill(size)
 
-class lazyheap:
-    def __init__(self):
-        self.heap = []  
-        self.count = 0   
-        self.sum = 0 
-        self.toremove = Counter()
-    
-    def push(self, item):
-        heappush(self.heap, item)
-        self.count += 1
-        self.sum += item
- 
-    def remove(self, item):
-        self.toremove[item] += 1    
-        self.count -= 1
-        self.sum -= item
- 
-    def top(self):
-        x = self.heap[0]
-        while self.toremove[x] > 0:
-            self.toremove[x] -= 1
-            heappop(self.heap)
-            x = self.heap[0]
+class BitManipulation:
+    def bin(self, num, size=None):
+        bin_string = bin(num)[2:]
+        return bin_string if (size == None) else bin_string.zfill(size)
+
+    def bit_sum(self, num):  # returns array of sum of bits of all numbers from 0 to num
+        b = len(self.bin(num))
+        bs = [0] * b
+        c = 2**b - 1
+        for i in range(b):
+            c -= 1 << i
+            bs[i] = (num & c) // 2
+            if num & ((1 << i)):
+                bs[i] += (num % (1 << i)) + 1
+        return bs
+
+
+class Maths:
+    def __init__(self, fact_memo=False, lpf_memo=False, max_n=(2 * (10**5) + 5)):
+        if fact_memo:
+            fact = [1] * max_n
+            invfact = [1] * max_n
+            for i in range(1, max_n):
+                fact[i] = (fact[i - 1] * i) % MOD
+                invfact[i] = (invfact[i - 1] * self.mod_inverse(i)) % MOD
+            self.fact = fact
+            self.invfact = invfact
+
+        if lpf_memo:
+            last_prime_factor = [0] * max_n
+            for i in range(2, max_n):
+                if last_prime_factor[i] > 0:
+                    continue
+                for j in range(i, max_n, i):
+                    last_prime_factor[j] = i
+            self.last_prime_factor = last_prime_factor
+
+    def ncr(self, n, r):
+        if n < r:
+            return 0
+        return (self.fact[n] * self.invfact[r] * self.invfact[n - r]) % MOD
+
+    def npr(self, n, r):
+        if n < r:
+            return 0
+        return (self.fact[n] * self.invfact[n - r]) % MOD
+
+    def mod_inverse(self, a):
+        return pow(a, MOD - 2, MOD)
+
+    def ncr_without_memo(self, n, r):
+        if n < r:
+            return 0
+        num = den = 1
+        for i in range(r):
+            num = (num * (n - i)) % MOD
+            den = (den * (i + 1)) % MOD
+        return (num * pow(den, MOD - 2, MOD)) % MOD
+
+    def npr_without_memo(self, n, r):
+        if n < r:
+            return 0
+        num = 1
+        for i in range(n, n - r, -1):
+            num = (num * i) % MOD
+        return num
+
+    def factors(self, n):
+        if n == 0:
+            return set()
+        return set(
+            reduce(
+                list.__add__,
+                ([i, n // i] for i in range(1, int(n**0.5) + 1) if n % i == 0),
+            )
+        )
+
+    def prime_factors_using_lpf(self, n):
+        factors = set()
+        while n > 1:
+            factors.add(self.last_prime_factor[n])
+            n //= self.last_prime_factor[n]
+        return factors
+
+    def prime_factors_with_power(self, n):
+        factors = []
+        divisor = 2
+        while divisor * divisor <= n:
+            power = 0
+            while n % divisor == 0:
+                n //= divisor
+                power += 1
+            if power > 0:
+                factors.append((divisor, power))
+            divisor += 1
+        if n > 1:
+            factors.append((n, 1))
+        return factors
+
+    def is_prime_using_lpf(self, n):
+        if n < 2:
+            return False
+        return self.last_prime_factor[n] == n
+
+    def is_prime(self, n):
+        if n == 1:
+            return False
+        for i in range(2, int(n**0.5) + 1):
+            if n % i == 0:
+                return False
+        return True
+
+
+class SortedList:
+    block_size = 700
+
+    def __init__(self, iterable=()):
+        self.macro = []
+        self.micros = [[]]
+        self.micro_size = [0]
+        self.ft_build()
+        self.size = 0
+        for item in iterable:
+            self.add(item)
+
+    def ft_build(self):
+        bit = self.bit = list(self.micro_size)
+        bit_size = self.bit_size = len(bit)
+        for i in range(bit_size):
+            j = i | (i + 1)
+            if j < bit_size:
+                bit[j] += bit[i]
+
+    def ft_update(self, idx, x):
+        while idx < self.bit_size:
+            self.bit[idx] += x
+            idx |= idx + 1
+
+    def ft_get(self, end):
+        x = 0
+        while end:
+            x += self.bit[end - 1]
+            end &= end - 1
         return x
- 
-    def pop(self):
-        x = self.top()
-        heappop(self.heap)
-        self.count -= 1
-        self.sum -= x
-        return x
 
-def bit_sum(num):
-    b = len(binn(num))
-    bs = [0] * b
-    c = 2**b - 1
-    for i in range(b):
-        c -= (1<<i)
-        bs[i] = (num & c) // 2
-        if num & ((1<<i)):
-            bs[i] += (num % (1<<i)) + 1
-    return bs
+    def ft_find_kth(self, k):
+        idx = -1
+        for d in reversed(range(self.bit_size.bit_length())):
+            right_idx = idx + (1 << d)
+            if right_idx < self.bit_size and self.bit[right_idx] <= k:
+                idx = right_idx
+                k -= self.bit[idx]
+        return idx + 1, k
 
-class RollingHash:
-    def __init__(self, base = 256, string = "", func = ord):
-        self.base = base
-        self.hash = 0
-        self.length = 0
-        self.func = func
-        for i in string:
-            self.right_add(i)
+    def add(self, x):
+        i = bisect_left(self.macro, x)
+        j = bisect_right(self.micros[i], x)
+        self.micros[i].insert(j, x)
+        self.size += 1
+        self.micro_size[i] += 1
+        self.ft_update(i, 1)
+        if len(self.micros[i]) >= self.block_size:
+            self.micros[i : i + 1] = (
+                self.micros[i][: self.block_size >> 1],
+                self.micros[i][self.block_size >> 1 :],
+            )
+            self.micro_size[i : i + 1] = self.block_size >> 1, self.block_size >> 1
+            self.ft_build()
+            self.macro.insert(i, self.micros[i + 1][0])
 
-    def right_add(self, char):
-        self.hash =  (self.hash * self.base + self.func(char)) % MOD
-        self.length += 1
-    
-    def left_add(self, char):
-        self.hash =  (self.hash + self.func(char) * pow(self.base, self.length, MOD)) % MOD
-        self.length += 1
+    def pop(self, k=-1):
+        i, j = self._find_kth(k)
+        self.size -= 1
+        self.micro_size[i] -= 1
+        self.ft_update(i, -1)
+        return self.micros[i].pop(j)
 
-# last_prime_factor = [0]*MAX
-# for i in range(2, MAX):
-#     if last_prime_factor[i] > 0: continue
-#     for j in range(i, MAX, i):
-#         last_prime_factor[j] = i
+    def remove(self, x):
+        c = self.count(x)
+        ind = self.bisect_left(x)
+        for _ in range(c):
+            self.pop(ind)
 
-# def prime_factors(n):
-#     factors = set()
-#     while n > 1:
-#         factors.add(last_prime_factor[n])
-#         n //= last_prime_factor[n]
-#     return factors
+    def __getitem__(self, k):
+        i, j = self._find_kth(k)
+        return self.micros[i][j]
 
-def prime_factors_with_power(n):
-    factors = []
-    divisor = 2
-    while divisor * divisor <= n:
-        power = 0
-        while n % divisor == 0:
-            n //= divisor
-            power += 1
-        if power > 0: factors.append((divisor, power))
-        divisor += 1
-    if n > 1: factors.append((n, 1))
-    return factors
+    def count(self, x):
+        return self.bisect_right(x) - self.bisect_left(x)
+
+    def __contains__(self, x):
+        return self.count(x) > 0
+
+    def bisect_left(self, x):
+        i = bisect_left(self.macro, x)
+        return self.ft_get(i) + bisect_left(self.micros[i], x)
+
+    def bisect_right(self, x):
+        i = bisect_right(self.macro, x)
+        return self.ft_get(i) + bisect_right(self.micros[i], x)
+
+    def _find_kth(self, k):
+        return self.ft_find_kth(k + self.size if k < 0 else k)
+
+    def __len__(self):
+        return self.size
+
+    def __iter__(self):
+        return (x for micro in self.micros for x in micro)
+
+    def __repr__(self):
+        return str(list(self))
 
 
-###############################################################################
-
-def solve(case=None):
-    pass
-
-###############################################################################
-
-multiple_cases = 1
-debug_enabled = 0
-Y,N = 'YES','NO'
-
-test_cases = 1 if not multiple_cases else int(input())
-for t in range(test_cases): solve(t+1)
+number_of_test_cases = 1 if not MULTIPLE_CASES else int(input())
+for t in range(number_of_test_cases):
+    if BOOLEAN_RETURN:
+        print(TRUE_MAPPING if solve(t + 1) else FALSE_MAPPING)
+    else:
+        solve(t + 1)
