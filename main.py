@@ -2,7 +2,7 @@ import sys, random, math, string, itertools
 from copy import deepcopy
 from collections import defaultdict, Counter, deque, OrderedDict
 from heapq import heapify, heappush, heappop
-from functools import cache, reduce
+from functools import cache
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
 from typing import *
@@ -270,25 +270,16 @@ class BitManipulation:
         return bs
 
 
-class Maths:
-    def __init__(self, fact_memo=False, lpf_memo=False, max_n=(2 * (10**5) + 5)):
-        if fact_memo:
-            fact = [1] * max_n
-            invfact = [1] * max_n
-            for i in range(1, max_n):
-                fact[i] = (fact[i - 1] * i) % MOD
-                invfact[i] = (invfact[i - 1] * self.mod_inverse(i)) % MOD
-            self.fact = fact
-            self.invfact = invfact
+class Combinatorics:
+    def __init__(self, pre_compute_limit=0):
+        self.fact = [1] * pre_compute_limit
+        self.invfact = [1] * pre_compute_limit
+        for i in range(1, pre_compute_limit):
+            self.fact[i] = (self.fact[i - 1] * i) % MOD
+            self.invfact[i] = (self.invfact[i - 1] * self.mod_inverse(i)) % MOD
 
-        if lpf_memo:
-            last_prime_factor = [0] * max_n
-            for i in range(2, max_n):
-                if last_prime_factor[i] > 0:
-                    continue
-                for j in range(i, max_n, i):
-                    last_prime_factor[j] = i
-            self.last_prime_factor = last_prime_factor
+    def mod_inverse(self, a):
+        return pow(a, MOD - 2, MOD)
 
     def ncr(self, n, r):
         if n < r:
@@ -299,9 +290,6 @@ class Maths:
         if n < r:
             return 0
         return (self.fact[n] * self.invfact[n - r]) % MOD
-
-    def mod_inverse(self, a):
-        return pow(a, MOD - 2, MOD)
 
     def ncr_without_memo(self, n, r):
         if n < r:
@@ -320,49 +308,64 @@ class Maths:
             num = (num * i) % MOD
         return num
 
-    def factors(self, n):
-        if n == 0:
-            return set()
-        return set(
-            reduce(
-                list.__add__,
-                ([i, n // i] for i in range(1, int(n**0.5) + 1) if n % i == 0),
-            )
-        )
 
-    def prime_factors_using_lpf(self, n):
-        factors = set()
+class Factors:
+    def __init__(self, pre_compute_limit=0):
+        self.last_prime_factor = [0] * pre_compute_limit
+        for i in range(2, pre_compute_limit):
+            if self.last_prime_factor[i] > 0:
+                continue
+            for j in range(i, pre_compute_limit, i):
+                self.last_prime_factor[j] = i
+
+    def prime_factors(self, n):
+        c = Counter()
         while n > 1:
-            factors.add(self.last_prime_factor[n])
+            c[self.last_prime_factor[n]] += 1
             n //= self.last_prime_factor[n]
-        return factors
+        prime_factors = list(c.items())
+        prime_factors.sort(key=lambda x: x[0])
+        return prime_factors
 
-    def prime_factors_with_power(self, n):
-        factors = []
+    def prime_factors_without_memo(self, n):
+        c = Counter()
         divisor = 2
         while divisor * divisor <= n:
-            power = 0
             while n % divisor == 0:
+                c[divisor] += 1
                 n //= divisor
-                power += 1
-            if power > 0:
-                factors.append((divisor, power))
             divisor += 1
         if n > 1:
-            factors.append((n, 1))
+            c[n] += 1
+        prime_factors = list(c.items())
+        prime_factors.sort(key=lambda x: x[0])
+        return prime_factors
+
+    def factors_without_memo(self, n):
+        if n == 0:
+            return set()
+        factors = set()
+        divisor = 1
+        while divisor * divisor <= n:
+            if n % divisor == 0:
+                factors.add(divisor)
+                factors.add(n // divisor)
+            divisor += 1
         return factors
 
-    def is_prime_using_lpf(self, n):
+    def is_prime(self, n):
         if n < 2:
             return False
         return self.last_prime_factor[n] == n
 
-    def is_prime(self, n):
-        if n == 1:
+    def is_prime_without_memo(self, n):
+        if n < 2:
             return False
-        for i in range(2, int(n**0.5) + 1):
-            if n % i == 0:
+        divisor = 2
+        while divisor * divisor <= n:
+            if n % divisor == 0:
                 return False
+            divisor += 1
         return True
 
 
