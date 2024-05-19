@@ -1,7 +1,10 @@
 import random, sys
+from os import path
 from importlib import reload
 from io import StringIO
 from unittest.mock import patch
+
+sys.path.append(path.abspath(path.join(path.dirname(__file__), '..')))
 
 def mock_input(inputs):
     def generator():

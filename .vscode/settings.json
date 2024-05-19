@@ -1,3 +1,8 @@
 {
-  "cph.language.python.Command": "python3.10"
+  "cph.language.python.Command": "python3.10",
+  "taskExplorer.clickAction": "Execute",
+  "taskExplorer.showLastTasks": false,
+  "taskExplorer.enabledTasks": {
+    "python": false
+  },
 }
