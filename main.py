@@ -18,12 +18,14 @@ def debug(*x, **y):
 
 ###############################################################################
 
+def solve_bruteforce(case=None):
+    pass
 
 def solve(case=None):
     pass
 
 
-MULTIPLE_CASES = 1
+NUMBER_OF_TEST_CASES = 2
 DEBUG_ENABLED = 0
 BOOLEAN_RETURN = 0
 MOD = 10**9 + 7
@@ -470,8 +472,7 @@ class SortedList:
         return str(list(self))
 
 
-number_of_test_cases = 1 if not MULTIPLE_CASES else int(input())
-for t in range(number_of_test_cases):
+for t in range(NUMBER_OF_TEST_CASES if NUMBER_OF_TEST_CASES <=1 else int(input())):
     if BOOLEAN_RETURN:
         print(TRUE_MAPPING if solve(t + 1) else FALSE_MAPPING)
     else:
