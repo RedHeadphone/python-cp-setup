@@ -78,19 +78,17 @@ while True:
             failed_inputs.append((inp,bfo,fo,bco,co))
 
     if len(failed_inputs) != 0:
-        print(f"{len(failed_inputs)}/{NUMBER_OF_TEST_CASES} failed!")
-        with open("test/failed_cases.txt", "w") as f:
-            for inp,bfo,fo,bco,co in failed_inputs:
-                f.write("input: \n" + '\n'.join(inp) + "\n")
-                f.write("bruteforce output: \n" + str(bfo) + "\n")
-                f.write("output: \n" + str(fo) + "\n")
-                f.write("bruteforce console output: \n" + str(bco))
-                f.write("console output: \n" + str(co))
-                f.write("\n\n")
+        print(f"{len(failed_inputs)}/{NUMBER_OF_TEST_CASES} failed!\n")
+        for inp,bfo,fo,bco,co in failed_inputs:
+            print("input: \n" + '\n'.join(inp))
+            if COMPARE_FUNCTION_OUTPUT and bfo != fo:
+                print("function output: \n" + str(fo))
+                print("bruteforce function output: \n" + str(bfo))
+            if COMPARE_CONSOLE_OUTPUT and bco != co:
+                print("console output: \n" + str(co),end="")
+                print("bruteforce console output: \n" + str(bco))
         if input("Try again? (Y/n) ").lower() == "n":
             break
     else:
-        with open("test/failed_cases.txt", "w") as f:
-            f.write("")
         print("All tests passed!")
         break
