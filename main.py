@@ -34,6 +34,14 @@ TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
 ###############################################################################
 
 
+def principal_of_inclusion_exclusion(arr,func):
+    n = len(arr)
+    for j in range(n):
+        multiplier = (-1) ** j
+        for comb in itertools.combinations(arr,j+1):
+            yield (func(comb), multiplier)
+
+
 class SegmentTree:
     def __init__(self, arr, func=lambda x, y: x + y, defaultvalue=0):
         self.n = len(arr)
