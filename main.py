@@ -37,11 +37,12 @@ TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
 
 
 class SegmentTree:
-    def __init__(self, arr, func=lambda x, y: x + y, defaultvalue=0):
-        self.n = len(arr)
-        self.segmentTree = [0] * self.n + arr
+    def __init__(self, arr, func=lambda x, y: x + y, default_value_func=lambda: 0):
+        self.n = 1 << (len(arr) - 1).bit_length()
         self.func = func
-        self.defaultvalue = defaultvalue
+        self.default_value_func = default_value_func
+        self.segmentTree = [self.default_value_func() for _ in range(2 * self.n)]
+        self.segmentTree[self.n : self.n + len(arr)] = arr
         for i in range(self.n - 1, 0, -1):
             self.segmentTree[i] = self.func(
                 self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
@@ -50,17 +51,18 @@ class SegmentTree:
     def query(self, l, r):
         l += self.n
         r += self.n
-        res = self.defaultvalue
+        resl = self.default_value_func()
+        resr = self.default_value_func()
         while l < r:
             if l & 1:
-                res = self.func(res, self.segmentTree[l])
+                resl = self.func(resl, self.segmentTree[l])
                 l += 1
             l >>= 1
             if r & 1:
                 r -= 1
-                res = self.func(res, self.segmentTree[r])
+                resr = self.func(self.segmentTree[r], resr)
             r >>= 1
-        return res
+        return self.func(resl, resr)
 
     def update(self, i, value):
         i += self.n
