@@ -103,6 +103,104 @@ class lazyheap:
         return x
 
 
+class LazySegTree:
+    def __init__(self, arr, merge_func, default_value_func, lazy_update_func, lazy_merge_func, default_lazy_func):
+        self._op = merge_func
+        self._e = default_value_func
+        self._mapping = lazy_update_func # (lazy_node, node) => node 
+        self._composition = lazy_merge_func # (lazy_node, lazy_node) => lazy_node
+        self._id = default_lazy_func
+        self._n = len(arr)
+        self._log = (self._n - 1).bit_length()
+        self._size = 1 << self._log
+        self._d = [self._e()] * (2 * self._size)
+        self._lz = [self._id()] * self._size
+        for i in range(self._n):
+            self._d[self._size + i] = arr[i]
+        for i in range(self._size - 1, 0, -1):
+            self._update(i)
+
+    def _update(self, k):
+        self._d[k] = self._op(self._d[2 * k], self._d[2 * k + 1])
+
+    def _all_apply(self, k, f):
+        self._d[k] = self._mapping(f, self._d[k])
+        if k < self._size:
+            self._lz[k] = self._composition(f, self._lz[k])
+
+    def _push(self, k):
+        self._all_apply(2 * k, self._lz[k])
+        self._all_apply(2 * k + 1, self._lz[k])
+        self._lz[k] = self._id()
+
+    def set(self, p, x):
+        p += self._size
+        for i in range(self._log, 0, -1):
+            self._push(p >> i)
+        self._d[p] = x
+        for i in range(1, self._log + 1):
+            self._update(p >> i)
+
+    def get(self, p):
+        p += self._size
+        for i in range(self._log, 0, -1):
+            self._push(p >> i)
+        return self._d[p]
+
+    def range_query(self, left, right):
+        if left == right:
+            return self._e()
+        left += self._size
+        right += self._size
+        for i in range(self._log, 0, -1):
+            if ((left >> i) << i) != left:
+                self._push(left >> i)
+            if ((right >> i) << i) != right:
+                self._push(right >> i)
+        sml = self._e()
+        smr = self._e()
+        while left < right:
+            if left & 1:
+                sml = self._op(sml, self._d[left])
+                left += 1
+            if right & 1:
+                right -= 1
+                smr = self._op(self._d[right], smr)
+            left >>= 1
+            right >>= 1
+        return self._op(sml, smr)
+
+    def range_update(self, left, right, f):
+        right += 1
+        if left == right:
+            return
+        left += self._size
+        right += self._size
+        for i in range(self._log, 0, -1):
+            if ((left >> i) << i) != left:
+                self._push(left >> i)
+            if ((right >> i) << i) != right:
+                self._push((right - 1) >> i)
+        l2 = left
+        r2 = right
+        while left < right:
+            if left & 1:
+                self._all_apply(left, f)
+                left += 1
+            if right & 1:
+                right -= 1
+                self._all_apply(right, f)
+            left >>= 1
+            right >>= 1
+        left = l2
+        right = r2
+        for i in range(1, self._log + 1):
+            if ((left >> i) << i) != left:
+                self._update(left >> i)
+            if ((right >> i) << i) != right:
+                self._update((right - 1) >> i)
+
+
 class SortedList:
     block_size = 700
 
@@ -110,12 +208,12 @@ class SortedList:
         self.macro = []
         self.micros = [[]]
         self.micro_size = [0]
-        self.ft_build()
+        self._ft_build()
         self.size = 0
         for item in iterable:
             self.add(item)
 
-    def ft_build(self):
+    def _ft_build(self):
         bit = self.bit = list(self.micro_size)
         bit_size = self.bit_size = len(bit)
         for i in range(bit_size):
@@ -123,19 +221,19 @@ class SortedList:
             if j < bit_size:
                 bit[j] += bit[i]
 
-    def ft_update(self, idx, x):
+    def _ft_update(self, idx, x):
         while idx < self.bit_size:
             self.bit[idx] += x
             idx |= idx + 1
 
-    def ft_get(self, end):
+    def _ft_get(self, end):
         x = 0
         while end:
             x += self.bit[end - 1]
             end &= end - 1
         return x
 
-    def ft_find_kth(self, k):
+    def _ft_find_kth(self, k):
         idx = -1
         for d in reversed(range(self.bit_size.bit_length())):
             right_idx = idx + (1 << d)
@@ -150,21 +248,21 @@ class SortedList:
         self.micros[i].insert(j, x)
         self.size += 1
         self.micro_size[i] += 1
-        self.ft_update(i, 1)
+        self._ft_update(i, 1)
         if len(self.micros[i]) >= self.block_size:
             self.micros[i : i + 1] = (
                 self.micros[i][: self.block_size >> 1],
                 self.micros[i][self.block_size >> 1 :],
             )
             self.micro_size[i : i + 1] = self.block_size >> 1, self.block_size >> 1
-            self.ft_build()
+            self._ft_build()
             self.macro.insert(i, self.micros[i + 1][0])
 
     def pop(self, k=-1):
         i, j = self._find_kth(k)
         self.size -= 1
         self.micro_size[i] -= 1
-        self.ft_update(i, -1)
+        self._ft_update(i, -1)
         return self.micros[i].pop(j)
 
     def remove(self, x):
@@ -185,14 +283,14 @@ class SortedList:
 
     def bisect_left(self, x):
         i = bisect_left(self.macro, x)
-        return self.ft_get(i) + bisect_left(self.micros[i], x)
+        return self._ft_get(i) + bisect_left(self.micros[i], x)
 
     def bisect_right(self, x):
         i = bisect_right(self.macro, x)
-        return self.ft_get(i) + bisect_right(self.micros[i], x)
+        return self._ft_get(i) + bisect_right(self.micros[i], x)
 
     def _find_kth(self, k):
-        return self.ft_find_kth(k + self.size if k < 0 else k)
+        return self._ft_find_kth(k + self.size if k < 0 else k)
 
     def __len__(self):
         return self.size
