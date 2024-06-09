@@ -171,7 +171,6 @@ class LazySegTree:
         return self._op(sml, smr)
 
     def range_update(self, left, right, f):
-        right += 1
         if left == right:
             return
         left += self._size
