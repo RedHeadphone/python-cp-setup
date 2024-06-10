@@ -164,23 +164,59 @@ class CustomSet:
 
 
 class RollingHash:
-    def __init__(self, base=256, string="", func=ord):
+    def __init__(self, string="", base=256, func=ord):
         self.base = base
-        self.hash = 0
-        self.length = 0
         self.func = func
+        self.MOD1 = 10**9 + 7
+        self.MOD2 = 10**9 + 9
+        self.hash1 = 0
+        self.hash2 = 0
+        self.length = 0
         for i in string:
             self.right_add(i)
 
     def right_add(self, char):
-        self.hash = (self.hash * self.base + self.func(char)) % MOD
+        self.hash1 = (self.hash1 * self.base + self.func(char)) % self.MOD1
+        self.hash2 = (self.hash2 * self.base + self.func(char)) % self.MOD2
         self.length += 1
+    
+    def right_remove(self, char):
+        self.hash1 = (
+            ((self.hash1 - self.func(char)) * pow(self.base, self.MOD1 - 2, self.MOD1)) % self.MOD1
+        )
+        self.hash2 = (
+            ((self.hash2 - self.func(char)) * pow(self.base, self.MOD2 - 2, self.MOD2)) % self.MOD2
+        )
+        self.length -= 1
+
+    def update(self, i, value, old_value):
+        power1 = pow(self.base, self.length - i - 1, self.MOD1)
+        power2 = pow(self.base, self.length - i - 1, self.MOD2)
+        self.hash1 = (self.hash1 - power1 * self.func(old_value) + power1 * self.func(value)) % self.MOD1
+        self.hash2 = (self.hash2 - power2 * self.func(old_value) + power2 * self.func(value)) % self.MOD2
 
     def left_add(self, char):
-        self.hash = (
-            self.hash + self.func(char) * pow(self.base, self.length, MOD)
-        ) % MOD
+        self.hash1 = (
+            self.hash1 + self.func(char) * pow(self.base, self.length, self.MOD1)
+        ) % self.MOD1
+        self.hash2 = (
+            self.hash2 + self.func(char) * pow(self.base, self.length, self.MOD2)
+        ) % self.MOD2
         self.length += 1
+    
+    def left_remove(self, char):
+        self.hash1 = (
+            self.hash1 - self.func(char) * pow(self.base, (self.length - 1), self.MOD1)
+        ) % self.MOD1
+        self.hash2 = (
+            self.hash2 - self.func(char) * pow(self.base, (self.length - 1), self.MOD2)
+        ) % self.MOD2
+        self.length -= 1
+
+    def get_hash(self):
+        return self.hash1 * self.MOD2 + self.hash2
+    
+    
 
 
 # recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
