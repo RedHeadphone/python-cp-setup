@@ -22,6 +22,8 @@ def debug(*x, **y):
 def solve_bruteforce(case=None):
     pass
 
+def execute_once():
+    pass
 
 def solve(case=None):
     pass
@@ -164,59 +166,108 @@ class CustomSet:
 
 
 class RollingHash:
+    MOD1 = 10**9 + 7
+    MOD2 = 10**9 + 9
+
     def __init__(self, string="", base=256, func=ord):
         self.base = base
         self.func = func
-        self.MOD1 = 10**9 + 7
-        self.MOD2 = 10**9 + 9
+        self.MOD1 = RollingHash.MOD1
+        self.MOD2 = RollingHash.MOD2
         self.hash1 = 0
         self.hash2 = 0
         self.length = 0
         for i in string:
             self.right_add(i)
 
+    @staticmethod
+    def precompute_powers(base, length):
+        global pow
+        b1, b2 = [1] * length, [1] * length
+        r1, r2 = pow(base, RollingHash.MOD1 - 2, RollingHash.MOD1), pow(base, RollingHash.MOD2 - 2, RollingHash.MOD2)
+        for i in range(1, length):
+            b1[i] = (b1[i - 1] * base) % RollingHash.MOD1
+            b2[i] = (b2[i - 1] * base) % RollingHash.MOD2
+        
+        old_pow = pow
+        
+        def new_pow(b,e,mod):
+            if b==base:
+                if mod==RollingHash.MOD1:
+                    if 0<=e<length:
+                        return b1[e]
+                    elif e==RollingHash.MOD1-2:
+                        return r1
+                elif mod==RollingHash.MOD2:
+                    if 0<=e<length:
+                        return b2[e]
+                    elif e==RollingHash.MOD2-2:
+                        return r2
+            return old_pow(b,e,mod)
+        
+        pow = new_pow
+
     def right_add(self, char):
         self.hash1 = (self.hash1 * self.base + self.func(char)) % self.MOD1
         self.hash2 = (self.hash2 * self.base + self.func(char)) % self.MOD2
         self.length += 1
-    
+
     def right_remove(self, char):
-        self.hash1 = (
-            ((self.hash1 - self.func(char)) * pow(self.base, self.MOD1 - 2, self.MOD1)) % self.MOD1
-        )
-        self.hash2 = (
-            ((self.hash2 - self.func(char)) * pow(self.base, self.MOD2 - 2, self.MOD2)) % self.MOD2
-        )
+        self.hash1 = ( (self.hash1 - self.func(char)) * pow(self.base, self.MOD1 - 2, self.MOD1) ) % self.MOD1
+        self.hash2 = ( (self.hash2 - self.func(char)) * pow(self.base, self.MOD2 - 2, self.MOD2) ) % self.MOD2
         self.length -= 1
 
     def update(self, i, value, old_value):
-        power1 = pow(self.base, self.length - i - 1, self.MOD1)
-        power2 = pow(self.base, self.length - i - 1, self.MOD2)
-        self.hash1 = (self.hash1 - power1 * self.func(old_value) + power1 * self.func(value)) % self.MOD1
-        self.hash2 = (self.hash2 - power2 * self.func(old_value) + power2 * self.func(value)) % self.MOD2
+        self.hash1 = (self.hash1 - pow(self.base, self.length - i - 1, self.MOD1) * (self.func(old_value) - self.func(value))) % self.MOD1
+        self.hash2 = (self.hash2 - pow(self.base, self.length - i - 1, self.MOD2) * (self.func(old_value) - self.func(value))) % self.MOD2
 
     def left_add(self, char):
-        self.hash1 = (
-            self.hash1 + self.func(char) * pow(self.base, self.length, self.MOD1)
-        ) % self.MOD1
-        self.hash2 = (
-            self.hash2 + self.func(char) * pow(self.base, self.length, self.MOD2)
-        ) % self.MOD2
+        self.hash1 = (self.hash1 + self.func(char) * pow(self.base, self.length, self.MOD1)) % self.MOD1
+        self.hash2 = (self.hash2 + self.func(char) * pow(self.base, self.length, self.MOD2)) % self.MOD2
         self.length += 1
-    
+
     def left_remove(self, char):
-        self.hash1 = (
-            self.hash1 - self.func(char) * pow(self.base, (self.length - 1), self.MOD1)
-        ) % self.MOD1
-        self.hash2 = (
-            self.hash2 - self.func(char) * pow(self.base, (self.length - 1), self.MOD2)
-        ) % self.MOD2
+        self.hash1 = (self.hash1 - self.func(char) * pow(self.base, (self.length -1), self.MOD1)) % self.MOD1
+        self.hash2 = (self.hash2 - self.func(char) * pow(self.base, (self.length -1), self.MOD2)) % self.MOD2
         self.length -= 1
 
     def get_hash(self):
         return self.hash1 * self.MOD2 + self.hash2
     
-    
+
+class RangeHash:
+    def __init__(self, string="", base=256, func=ord, reverse=False):
+        rolling_hash_pre = RollingHash(base=base, func=func)
+        self.MOD1 = rolling_hash_pre.MOD1
+        self.MOD2 = rolling_hash_pre.MOD2
+
+        n = len(string)
+        self.base = base
+        self.prefix_hash1 = [0] * (n + 1)
+        self.prefix_hash2 = [0] * (n + 1)
+        if reverse:
+            rolling_hash_suf = RollingHash(base=base, func=func)
+            self.suffix_hash1 = [0] * (n + 1)
+            self.suffix_hash2 = [0] * (n + 1)
+        
+        for i in range(n):
+            rolling_hash_pre.right_add(string[i])
+            self.prefix_hash1[i + 1] = rolling_hash_pre.hash1
+            self.prefix_hash2[i + 1] = rolling_hash_pre.hash2
+            if reverse:
+                rolling_hash_suf.right_add(string[n-1-i])
+                self.suffix_hash1[n - 1 - i] = rolling_hash_suf.hash1
+                self.suffix_hash2[n - 1 - i] = rolling_hash_suf.hash2
+
+    def get_hash(self, l, r):
+        hash1 = (self.prefix_hash1[r] - self.prefix_hash1[l] * pow(self.base, r-l, self.MOD1)) % self.MOD1
+        hash2 = (self.prefix_hash2[r] - self.prefix_hash2[l] * pow(self.base, r-l, self.MOD2)) % self.MOD2
+        return hash1 * self.MOD2 + hash2
+
+    def get_rev_hash(self, l, r):
+        hash1 = (self.suffix_hash1[l] - self.suffix_hash1[r] * pow(self.base, r-l, self.MOD1)) % self.MOD1
+        hash2 = (self.suffix_hash2[l] - self.suffix_hash2[r] * pow(self.base, r-l, self.MOD2)) % self.MOD2
+        return hash1 * self.MOD2 + hash2
 
 
 # recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
@@ -380,6 +431,7 @@ class Factors:
             divisor += 1
         return True
 
+execute_once()
 
 for t in range(NUMBER_OF_TEST_CASES if NUMBER_OF_TEST_CASES <= 1 else int(input())):
     if BOOLEAN_RETURN:
