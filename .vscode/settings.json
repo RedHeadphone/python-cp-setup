@@ -5,4 +5,5 @@
   "taskExplorer.enabledTasks": {
     "python": false
   },
+  "cph.general.timeOut": 10000
 }
