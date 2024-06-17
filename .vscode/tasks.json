@@ -1,36 +1,26 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558
-  // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run main.py",
+      "label": "1. Run main.py",
       "type": "shell",
       "command": [
-        "export LOCAL_DEV=true;",
-        "python main.py < input.txt > output.txt;"
-      ],
-      "problemMatcher": []
+        "python3.10 main.py;"
+      ]
     },
     {
-      "label": "Generate inputs to input.txt",
+      "label": "2. Test main.py with random cases",
       "type": "shell",
       "command": [
-        "export LOCAL_DEV=true;",
-        "python testcase_gen.py > input.txt;"
-      ],
-      "problemMatcher": []
+        "python3.10 scripts/test_with_random_cases.py;"
+      ]
     },
     {
-      "label": "Compare bruteforce with main.py",
+      "label": "3. Run type_from_clipboard.py",
       "type": "shell",
       "command": [
-        "export LOCAL_DEV=true;",
-        "python main.py < input.txt > output.txt;",
-        "python bruteforce.py < input.txt > output_bruteforce.txt;",
-        "diff output.txt output_bruteforce.txt;"
-      ],
-      "problemMatcher": []
+        "python3.10 scripts/type_from_clipboard.py;"
+      ]
     }
   ]
 }
