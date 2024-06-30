@@ -5,7 +5,6 @@ from bisect import bisect_left, bisect_right
 
 
 class MergeSortTree:
-
     def __init__(self, arr):
         self.log = len(arr).bit_length()
         if len(arr) == 1 << (self.log - 1):
@@ -28,7 +27,7 @@ class MergeSortTree:
                     itertools.accumulate(self.tree[depth][i * w : (i + 1) * w])
                 )
 
-    def query(self, l, r, x):
+    def query(self, l, r, x, less_than_equal=True):
         separate = []
         ret = 0
         for depth in range(self.log + 1):
@@ -48,17 +47,31 @@ class MergeSortTree:
 
         for l, r in separate:
             depth = (r - l).bit_length() - 1
-            ok, ng = l - 1, r
-            while ng - ok > 1:
-                m = (ng + ok) // 2
-                if self.tree[depth][m] <= x:
-                    ok = m
-                else:
-                    ng = m
-            index = ng - 1
-            if index < l:
-                continue
-            ret += self.csum[depth][index]
+            if less_than_equal:  # <=x
+                ok, ng = l - 1, r
+                while ng - ok > 1:
+                    m = (ng + ok) // 2
+                    if self.tree[depth][m] <= x:
+                        ok = m
+                    else:
+                        ng = m
+                index = ng - 1
+                if index >= l:
+                    ret += self.csum[depth][index]
+            else:  # >=x
+                ok, ng = r, l - 1
+                while ok - ng > 1:
+                    m = (ok + ng) // 2
+                    if self.tree[depth][m] >= x:
+                        ok = m
+                    else:
+                        ng = m
+                index = ok
+                if index < r:
+                    if index == l:
+                        ret += self.csum[depth][r - 1]
+                    else:
+                        ret += self.csum[depth][r - 1] - self.csum[depth][index - 1]
         return ret
 
 
@@ -70,7 +83,7 @@ def principal_of_inclusion_exclusion(arr, func):
             yield (func(comb), multiplier)
 
 
-class lazyheap:
+class LazyHeap:
     def __init__(self):
         self.heap = []
         self.count = 0
@@ -103,12 +116,20 @@ class lazyheap:
         return x
 
 
-class LazySegTree:
-    def __init__(self, arr, merge_func, default_value_func, lazy_update_func, lazy_merge_func, default_lazy_func):
+class LazySegmentTree:
+    def __init__(
+        self,
+        arr,
+        merge_func,
+        default_value_func,
+        lazy_update_func,
+        lazy_merge_func,
+        default_lazy_func,
+    ):
         self._op = merge_func
         self._e = default_value_func
-        self._mapping = lazy_update_func # (lazy_node, node) => node 
-        self._composition = lazy_merge_func # (lazy_node, lazy_node) => lazy_node
+        self._mapping = lazy_update_func  # (lazy_node, node) => node
+        self._composition = lazy_merge_func  # (lazy_node, lazy_node) => lazy_node
         self._id = default_lazy_func
         self._n = len(arr)
         self._log = (self._n - 1).bit_length()
