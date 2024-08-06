@@ -381,17 +381,17 @@ class Combinatorics:
         return pow(a, MOD - 2, MOD)
 
     def ncr(self, n, r):
-        if n < r:
+        if n < r or r < 0:
             return 0
         return (self.fact[n] * self.invfact[r] * self.invfact[n - r]) % MOD
 
     def npr(self, n, r):
-        if n < r:
+        if n < r or r < 0:
             return 0
         return (self.fact[n] * self.invfact[n - r]) % MOD
 
     def ncr_without_memo(self, n, r):
-        if n < r:
+        if n < r or r < 0:
             return 0
         num = den = 1
         for i in range(r):
@@ -400,7 +400,7 @@ class Combinatorics:
         return (num * pow(den, MOD - 2, MOD)) % MOD
 
     def npr_without_memo(self, n, r):
-        if n < r:
+        if n < r or r < 0:
             return 0
         num = 1
         for i in range(n, n - r, -1):
