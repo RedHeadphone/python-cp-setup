@@ -2,6 +2,8 @@
 
 This repository offers a comprehensive setup for competitive programming in Python. It includes VS Code configurations, scripts, boilerplate templates, commonly used data structures and algorithms, and a lot more, ensuring an efficient coding environment for CPers of all levels.
 
+## Setup
+
 ### PyPy Setup
 
 1. **Download PyPy**  
@@ -30,3 +32,25 @@ This repository offers a comprehensive setup for competitive programming in Pyth
    ```bash
    sudo apt-get install xclip xdotool
    ```
+
+### VS Code Extensions Setup
+
+Extensions that should be added to VS Code:
+
+- **[Competitive Programming Helper (cph)](https://marketplace.visualstudio.com/items?itemName=DivyanshuAgrawal.competitive-programming-helper)**: Simplifies the process of downloading problems, compiling, and judging in competitive programming.
+
+- **[Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)**: Provides essential Python language support, including IntelliSense, debugging, and linting.
+
+- **[Task Explorer](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer)**: Manages tasks like running code or scripts, so we don't have to write commands every time.
+
+## Usage
+
+### main.py
+
+### addon.py
+
+### scripts/test_with_random_cases.py
+
+### scripts/type_from_clipboard.bash
+
+## Acknowledgements
