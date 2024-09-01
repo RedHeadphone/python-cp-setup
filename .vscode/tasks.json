@@ -5,21 +5,21 @@
       "label": "1. Run main.py",
       "type": "shell",
       "command": [
-        "python3.10 main.py;"
+        ".venv/bin/python3.10 main.py;"
       ]
     },
     {
       "label": "2. Test main.py with random cases",
       "type": "shell",
       "command": [
-        "python3.10 scripts/test_with_random_cases.py;"
+        ".venv/bin/python3.10 scripts/test_with_random_cases.py;"
       ]
     },
     {
       "label": "3. Run type_from_clipboard.py",
       "type": "shell",
       "command": [
-        "python3.10 scripts/type_from_clipboard.py;"
+        "./scripts/type_from_clipboard.bash;"
       ]
     }
   ]

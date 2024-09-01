@@ -1,9 +1,10 @@
 {
-  "cph.language.python.Command": "python3.10",
+  "cph.language.python.Command": ".venv/bin/python3.10",
+  "python.defaultInterpreterPath": ".venv/bin/python3.10",
   "taskExplorer.clickAction": "Execute",
   "taskExplorer.showLastTasks": false,
   "taskExplorer.enabledTasks": {
     "python": false
   },
-  "cph.general.timeOut": 10000
+  "cph.general.timeOut": 5000
 }
