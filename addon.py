@@ -28,6 +28,9 @@ class MergeSortTree:
                 )
 
     def query(self, l, r, x, less_than_equal=True):
+        """
+        :param less_than_equal: True if <=x, False if >=x
+        """
         separate = []
         ret = 0
         for depth in range(self.log + 1):
@@ -47,7 +50,7 @@ class MergeSortTree:
 
         for l, r in separate:
             depth = (r - l).bit_length() - 1
-            if less_than_equal:  # <=x
+            if less_than_equal:
                 ok, ng = l - 1, r
                 while ng - ok > 1:
                     m = (ng + ok) // 2
@@ -58,7 +61,7 @@ class MergeSortTree:
                 index = ng - 1
                 if index >= l:
                     ret += self.csum[depth][index]
-            else:  # >=x
+            else:
                 ok, ng = r, l - 1
                 while ok - ng > 1:
                     m = (ok + ng) // 2
@@ -126,10 +129,15 @@ class LazySegmentTree:
         lazy_merge_func,
         default_lazy_func,
     ):
+        """
+        :param merge_func: (node, node) => node
+        :param lazy_update_func: (lazy_node, node) => node
+        :param lazy_merge_func: (lazy_node, lazy_node) => lazy_node
+        """
         self._op = merge_func
         self._e = default_value_func
-        self._mapping = lazy_update_func  # (lazy_node, node) => node
-        self._composition = lazy_merge_func  # (lazy_node, lazy_node) => lazy_node
+        self._mapping = lazy_update_func
+        self._composition = lazy_merge_func
         self._id = default_lazy_func
         self._n = len(arr)
         self._log = (self._n - 1).bit_length()

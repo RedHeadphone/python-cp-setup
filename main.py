@@ -103,14 +103,20 @@ class UnionFind:
             self.sets_count -= 1
 
 
-# Custom HashMap and Set for Python's Anti-hash-table test
 class CustomHashMap:
-    def __init__(self, type=dict, arg=[]):  # allowed types: dict, defaultdict, Counter
+    def __init__(self, map_type=dict, arg=[]):
+        """
+        Custom HashMap for Python's Anti-hash-table test
+        :param map_type: type of the map (allowed types: dict, defaultdict, Counter)
+        :param arg: argument for the map (should be list if map_type is Counter and function if map_type is defaultdict)
+        """
         self.RANDOM = random.randrange(2**62)
-        if type != defaultdict:
-            self.dict = type([self.wrapper(i) for i in arg])
+        if map_type == Counter:
+            self.dict = map_type([self.wrapper(i) for i in arg])
+        elif map_type == defaultdict:
+            self.dict = map_type(arg)
         else:
-            self.dict = type(arg)  # arg should be function
+            self.dict = map_type()
 
     def wrapper(self, num):
         return num ^ self.RANDOM
@@ -142,6 +148,9 @@ class CustomHashMap:
 
 class CustomSet:
     def __init__(self, arr=[]):
+        """
+        Custom Set for Python's Anti-hash-table test
+        """
         self.RANDOM = random.randrange(2**62)
         self.set = set([self.wrapper(i) for i in arr])
 
@@ -306,8 +315,11 @@ class RangeHash:
         return hash1 * self.MOD2 + hash2
 
 
-# recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
 def bootstrap(f):
+    """
+    recursion limit fix decorator, change 'return' to 'yield' and add 'yield' before calling the function
+    and add 'yield' after the function if not returning anything
+    """
     stack = []
 
     def wrappedfunc(*args, **kwargs):
@@ -357,7 +369,10 @@ class BitManipulation:
         bin_string = bin(num)[2:]
         return bin_string if (size == None) else bin_string.zfill(size)
 
-    def bit_sum(self, num):  # returns array of sum of bits of all numbers from 0 to num
+    def bit_sum(self, num):
+        """
+        returns array of sum of bits of all numbers from 0 to num
+        """
         b = len(self.bin(num))
         bs = [0] * b
         c = 2**b - 1
