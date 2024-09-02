@@ -1,9 +1,10 @@
 {
-  "cph.language.python.Command": "python3.10",
+  // "cph.language.python.Command": "<absolute path to project root directory>/.venv/bin/pypy3",
+  "python.defaultInterpreterPath": ".venv/bin/pypy3",
   "taskExplorer.clickAction": "Execute",
   "taskExplorer.showLastTasks": false,
   "taskExplorer.enabledTasks": {
     "python": false
   },
-  "cph.general.timeOut": 10000
+  "cph.general.timeOut": 5000
 }
