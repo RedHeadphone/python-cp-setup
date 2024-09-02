@@ -7,15 +7,17 @@ This repository offers a comprehensive setup for competitive programming in Pyth
 ### PyPy Setup
 
 1. **Download PyPy**  
+
    You can download PyPy from the official website: [https://pypy.org/download.html](https://pypy.org/download.html)
 
-2. **Setup Virtual Environment with Poetry**  
+3. **Setup Virtual Environment with Poetry**  
+
    After downloading PyPy, you can set it up in a virtual environment using Poetry with the following command:
    ```bash
    poetry env use /path/to/pypy3.10/bin/pypy3
    ```
 
-3. **Configure in VS Code**
+5. **Configure in VS Code**
    - Select the Python interpreter in VS Code and set it to the PyPy interpreter located at `.venv/bin/pypy3`.
    - Update the `cph.language.python.Command` in the `.vscode/settings.json` file to point to the absolute path of the PyPy interpreter inside your virtual environment.
 
