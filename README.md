@@ -15,6 +15,11 @@ This repository offers a comprehensive setup for competitive programming in Pyth
    poetry env use /path/to/pypy3.10/bin/pypy3
    ```
 
+3. **Configure in VS Code**
+
+   - Select the Python interpreter in VS Code and set it to the PyPy interpreter located at `.venv/bin/pypy3`.
+   - Update the `cph.language.python.Command` in the `.vscode/settings.json` file to point to the absolute path of the PyPy interpreter inside your virtual environment.
+
 ### Setup for type_from_clipboard.bash
 
 1. **Make Script Executable**
