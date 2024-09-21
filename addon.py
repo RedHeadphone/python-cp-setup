@@ -86,6 +86,36 @@ def principal_of_inclusion_exclusion(arr, func):
             yield (func(comb), multiplier)
 
 
+def mo_s_algorithm(queries, state, add, remove, get):
+    """
+    :param queries: [(l, r, idx)]
+    :param add: (i, state) => void
+    :param remove: (i, state) => void
+    :param get: state => any
+    """
+    bsize = 500
+    queries.sort(key=lambda q: (q[0] // bsize, q[1] * (-1) ** (q[0] // bsize % 2)))
+    cur_l, cur_r = 0, -1
+    answers = [0] * len(queries)
+
+    for l, r, idx in queries:
+        while cur_l > l:
+            cur_l -= 1
+            add(cur_l, state)
+        while cur_r < r:
+            cur_r += 1
+            add(cur_r, state)
+        while cur_l < l:
+            remove(cur_l, state)
+            cur_l += 1
+        while cur_r > r:
+            remove(cur_r, state)
+            cur_r -= 1
+        answers[idx] = get(state)
+
+    return answers
+
+
 class LazyHeap:
     def __init__(self):
         self.heap = []
