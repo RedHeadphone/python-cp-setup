@@ -31,7 +31,7 @@ def solve(case=None):
     pass
 
 
-NUMBER_OF_TEST_CASES = 2
+INPUT_NUMBER_OF_TEST_CASES = 1
 DEBUG_ENABLED = 0
 BOOLEAN_RETURN = 0
 MOD = 10**9 + 7
@@ -485,7 +485,7 @@ class Factors:
 
 execute_once()
 
-for t in range(NUMBER_OF_TEST_CASES if NUMBER_OF_TEST_CASES <= 1 else int(input())):
+for t in range(int(input()) if INPUT_NUMBER_OF_TEST_CASES else 1):
     if BOOLEAN_RETURN:
         print(TRUE_MAPPING if solve(t + 1) else FALSE_MAPPING)
     else:

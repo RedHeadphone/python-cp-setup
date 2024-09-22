@@ -53,10 +53,7 @@ This file includes commonly used algorithms, data structures, library imports, a
 - `execute_once` function: Runs once at the beginning to precompute values for all test cases, assigning them to global variables.
 - `solve` function: Called for each test case to run the actual solution.
 - `BOOLEAN_RETURN`: If set, allows the function to return `True`/`False` instead of printing, with the output customizable using `TRUE_MAPPING` and `FALSE_MAPPING` for `YES`/`NO` or other text.
-- `NUMBER_OF_TEST_CASES`: Controls the number of test cases:
-   - 0 for zero cases
-   - 1 for a single case
-   - 2 to prompt for the number of test cases
+- `INPUT_NUMBER_OF_TEST_CASES`: If enabled, the program reads the number of test cases; otherwise, it defaults to running a single test case.
 
 There are two ways to debug it:
 
