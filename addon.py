@@ -27,10 +27,7 @@ class MergeSortTree:
                     itertools.accumulate(self.tree[depth][i * w : (i + 1) * w])
                 )
 
-    def query(self, l, r, x, less_than_equal=True):
-        """
-        :param less_than_equal: True if <=x, False if >=x
-        """
+    def query(self, l, r, x):
         separate = []
         ret = 0
         for depth in range(self.log + 1):
@@ -50,31 +47,16 @@ class MergeSortTree:
 
         for l, r in separate:
             depth = (r - l).bit_length() - 1
-            if less_than_equal:
-                ok, ng = l - 1, r
-                while ng - ok > 1:
-                    m = (ng + ok) // 2
-                    if self.tree[depth][m] <= x:
-                        ok = m
-                    else:
-                        ng = m
-                index = ng - 1
-                if index >= l:
-                    ret += self.csum[depth][index]
-            else:
-                ok, ng = r, l - 1
-                while ok - ng > 1:
-                    m = (ok + ng) // 2
-                    if self.tree[depth][m] >= x:
-                        ok = m
-                    else:
-                        ng = m
-                index = ok
-                if index < r:
-                    if index == l:
-                        ret += self.csum[depth][r - 1]
-                    else:
-                        ret += self.csum[depth][r - 1] - self.csum[depth][index - 1]
+            ok, ng = l - 1, r
+            while ng - ok > 1:
+                m = (ng + ok) // 2
+                if self.tree[depth][m] <= x:
+                    ok = m
+                else:
+                    ng = m
+            index = ng - 1
+            if index >= l:
+                ret += self.csum[depth][index]
         return ret
 
 
