@@ -4,23 +4,17 @@
     {
       "label": "1. Run main.py",
       "type": "shell",
-      "command": [
-        ".venv/bin/pypy3 main.py;"
-      ]
+      "command": [".venv/bin/pypy3 main.py;"]
     },
     {
       "label": "2. Test main.py with random cases",
       "type": "shell",
-      "command": [
-        ".venv/bin/pypy3 scripts/test_with_random_cases.py;"
-      ]
+      "command": [".venv/bin/pypy3 scripts/test_with_random_cases.py;"]
     },
     {
       "label": "3. Run type_from_clipboard.py",
       "type": "shell",
-      "command": [
-        "./scripts/type_from_clipboard.bash;"
-      ]
+      "command": ["./scripts/type_from_clipboard.bash;"]
     }
   ]
 }
