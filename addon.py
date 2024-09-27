@@ -1,7 +1,33 @@
-import itertools
-from collections import Counter
-from heapq import heappush, heappop
-from bisect import bisect_left, bisect_right
+from main import itertools, Counter, heappush, heappop, bisect_left, bisect_right
+
+
+class LazyHeap:
+    def __init__(self):
+        self.heap = []
+        self.count = 0
+        self.toremove = Counter()
+
+    def push(self, item):
+        heappush(self.heap, item)
+        self.count += 1
+
+    def remove(self, item):
+        self.toremove[item] += 1
+        self.count -= 1
+
+    def top(self):
+        x = self.heap[0]
+        while self.toremove[x] > 0:
+            self.toremove[x] -= 1
+            heappop(self.heap)
+            x = self.heap[0]
+        return x
+
+    def pop(self):
+        x = self.top()
+        heappop(self.heap)
+        self.count -= 1
+        return x
 
 
 class MergeSortTree:
@@ -96,39 +122,6 @@ def mo_s_algorithm(queries, state, add, remove, get):
         answers[idx] = get(state)
 
     return answers
-
-
-class LazyHeap:
-    def __init__(self):
-        self.heap = []
-        self.count = 0
-        self.sum = 0
-        self.toremove = Counter()
-
-    def push(self, item):
-        heappush(self.heap, item)
-        self.count += 1
-        self.sum += item
-
-    def remove(self, item):
-        self.toremove[item] += 1
-        self.count -= 1
-        self.sum -= item
-
-    def top(self):
-        x = self.heap[0]
-        while self.toremove[x] > 0:
-            self.toremove[x] -= 1
-            heappop(self.heap)
-            x = self.heap[0]
-        return x
-
-    def pop(self):
-        x = self.top()
-        heappop(self.heap)
-        self.count -= 1
-        self.sum -= x
-        return x
 
 
 class LazySegmentTree:
