@@ -57,7 +57,7 @@ This file includes commonly used algorithms, data structures, library imports, a
 
 There are two ways to debug it:
 
-1. VS Code Debugger: Provides more control over debugging, allowing you to set breakpoints and step through code.
+1. VS Code Debugger: Provides more control over debugging, allowing you to set breakpoints and step through code. Uses `debug/input.txt` and `debug/output.txt` for input and output respectively.
 2. Debug Function: Prints debug information to `stderr` if `DEBUG_ENABLED` is set.
 
 ### addon.py

@@ -2,17 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "1. Run main.py",
-      "type": "shell",
-      "command": [".venv/bin/pypy3 main.py;"]
-    },
-    {
-      "label": "2. Test main.py with random cases",
+      "label": "1. Test main.py with random cases",
       "type": "shell",
       "command": [".venv/bin/pypy3 scripts/test_with_random_cases.py;"]
     },
     {
-      "label": "3. Run type_from_clipboard.py",
+      "label": "2. Run type_from_clipboard.py",
       "type": "shell",
       "command": ["./scripts/type_from_clipboard.bash;"]
     }
