@@ -6,7 +6,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "args": ["<", "debug/input.txt",">","debug/output.txt"],
+      "args": ["<", "debug/input.txt",">","debug/output.txt","2>&1"],
       "console": "integratedTerminal"
     }
   ]
