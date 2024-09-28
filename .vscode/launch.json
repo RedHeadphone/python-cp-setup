@@ -2,11 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python Debugger: main.py",
+      "name": "Python Debugger",
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "args": ["<", "debug/input.txt",">","debug/output.txt","2>&1"],
+      "args": ["<", "debug/input.txt", ">", "debug/output.txt", "2>&1"],
       "console": "integratedTerminal"
     }
   ]
