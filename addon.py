@@ -1,6 +1,69 @@
 from main import itertools, Counter, heappush, heappop, bisect_left, bisect_right
 
 
+class SegmentTree:
+    def __init__(self, arr, func=lambda x, y: x + y, default_value_func=lambda: 0):
+        self.n = 1 << (len(arr) - 1).bit_length()
+        self.func = func
+        self.default_value_func = default_value_func
+        self.segmentTree = [self.default_value_func() for _ in range(2 * self.n)]
+        self.segmentTree[self.n : self.n + len(arr)] = arr
+        for i in range(self.n - 1, 0, -1):
+            self.segmentTree[i] = self.func(
+                self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
+            )
+
+    def query(self, l, r):
+        l += self.n
+        r += self.n
+        resl = self.default_value_func()
+        resr = self.default_value_func()
+        while l < r:
+            if l & 1:
+                resl = self.func(resl, self.segmentTree[l])
+                l += 1
+            l >>= 1
+            if r & 1:
+                r -= 1
+                resr = self.func(self.segmentTree[r], resr)
+            r >>= 1
+        return self.func(resl, resr)
+
+    def update(self, i, value):
+        i += self.n
+        self.segmentTree[i] = value
+        while i > 1:
+            i >>= 1
+            self.segmentTree[i] = self.func(
+                self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
+            )
+
+
+class UnionFind:
+    def __init__(self, n):
+        self.n = n
+        self.parents = list(range(n))
+        self.count = [1] * n
+        self.sets_count = n
+
+    def find(self, x):
+        x_copy = x
+        while self.parents[x] != x:
+            x = self.parents[x]
+        while x_copy != x:
+            x_copy, self.parents[x_copy] = self.parents[x_copy], x
+        return x
+
+    def union(self, x, y):
+        x, y = self.find(x), self.find(y)
+        if x != y:
+            if self.count[x] < self.count[y]:
+                x, y = y, x
+            self.parents[y] = x
+            self.count[x] += self.count[y]
+            self.sets_count -= 1
+
+
 class LazyHeap:
     def __init__(self):
         self.heap = []
@@ -84,6 +147,21 @@ class MergeSortTree:
             if index >= l:
                 ret += self.csum[depth][index]
         return ret
+
+
+def bit_count(self, num):
+    """
+    Returns an array of bit counts for each bit position from 0 to num.
+    """
+    b = len(self.bin(num))
+    bs = [0] * b
+    c = 2**b - 1
+    for i in range(b):
+        c -= 1 << i
+        bs[i] = (num & c) // 2
+        if num & (1 << i):
+            bs[i] += (num % (1 << i)) + 1
+    return bs
 
 
 def principal_of_inclusion_exclusion(arr, func):
