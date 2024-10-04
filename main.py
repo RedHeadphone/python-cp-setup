@@ -32,6 +32,7 @@ def solve(case=None):
 
 
 INPUT_NUMBER_OF_TEST_CASES = 1
+SKIP_SOLVE = 0
 DEBUG_ENABLED = 0
 BOOLEAN_RETURN = 0
 MOD = 10**9 + 7
@@ -131,8 +132,9 @@ def binary_search(left, right, check, start_from_left):
 
 execute_once()
 
-for t in range(int(input()) if INPUT_NUMBER_OF_TEST_CASES else 1):
-    if BOOLEAN_RETURN:
-        print(TRUE_MAPPING if solve(t + 1) else FALSE_MAPPING)
-    else:
-        solve(t + 1)
+if not SKIP_SOLVE:
+    for t in range(int(input()) if INPUT_NUMBER_OF_TEST_CASES else 1):
+        if BOOLEAN_RETURN:
+            print(TRUE_MAPPING if solve(t + 1) else FALSE_MAPPING)
+        else:
+            solve(t + 1)
