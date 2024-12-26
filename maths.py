@@ -1,4 +1,4 @@
-from main import MOD, Counter
+from main import MOD, Counter, deque
 
 
 class Combinatorics:
@@ -39,21 +39,23 @@ class Combinatorics:
 
 class Factors:
     def __init__(self, pre_compute_limit=0):
-        self.last_prime_factor = [0] * pre_compute_limit
+        self.smallest_prime_factor = [0] * pre_compute_limit
+        self.primes = []
         for i in range(2, pre_compute_limit):
-            if self.last_prime_factor[i] > 0:
-                continue
-            for j in range(i, pre_compute_limit, i):
-                self.last_prime_factor[j] = i
+            if self.smallest_prime_factor[i] == 0:
+                self.smallest_prime_factor[i] = i
+                self.primes.append(i)
+            for j in range(len(self.primes)):
+                if i * self.primes[j] >= pre_compute_limit or self.primes[j] > self.smallest_prime_factor[i]:
+                    break
+                self.smallest_prime_factor[i * self.primes[j]] = self.primes[j]
 
     def prime_factors(self, n):
         c = Counter()
         while n > 1:
-            c[self.last_prime_factor[n]] += 1
-            n //= self.last_prime_factor[n]
-        prime_factors = list(c.items())
-        prime_factors.sort(key=lambda x: x[0])
-        return prime_factors
+            c[self.smallest_prime_factor[n]] += 1
+            n //= self.smallest_prime_factor[n]
+        return sorted(c.items())
 
     def prime_factors_without_memo(self, n):
         c = Counter()
@@ -65,13 +67,27 @@ class Factors:
             divisor += 1
         if n > 1:
             c[n] += 1
-        prime_factors = list(c.items())
-        prime_factors.sort(key=lambda x: x[0])
-        return prime_factors
+        return sorted(c.items())
+
+    def factors(self, n):
+        factors = set()
+        prime_factors = self.prime_factors(n)
+
+        queue = deque([(0, 1)])
+        while queue:
+            index, current = queue.popleft()
+            if index == len(prime_factors):
+                factors.add(current)
+                continue
+            p, count = prime_factors[index]
+            for i in range(count + 1):
+                queue.append((index + 1, current))
+                current *= p
+
+        return factors
+
 
     def factors_without_memo(self, n):
-        if n == 0:
-            return set()
         factors = set()
         divisor = 1
         while divisor * divisor <= n:
@@ -84,7 +100,7 @@ class Factors:
     def is_prime(self, n):
         if n < 2:
             return False
-        return self.last_prime_factor[n] == n
+        return self.smallest_prime_factor[n] == n
 
     def is_prime_without_memo(self, n):
         if n < 2:
