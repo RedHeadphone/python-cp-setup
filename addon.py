@@ -164,12 +164,9 @@ def bit_count(self, num):
     return bs
 
 
-def principal_of_inclusion_exclusion(arr, func):
-    n = len(arr)
-    for j in range(n):
-        multiplier = (-1) ** j
-        for comb in itertools.combinations(arr, j + 1):
-            yield (func(comb), multiplier)
+def principal_of_inclusion_exclusion(n):
+    for mask in range(1, 1 << n):
+        yield mask, pow(-1, mask.bit_count() + 1)
 
 
 def mo_s_algorithm(queries, state, add, remove, get):
