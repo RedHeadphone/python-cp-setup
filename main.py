@@ -130,6 +130,15 @@ def binary_search(left, right, check, start_from_left):
     return ans
 
 
+def set(arr):
+    arr.sort()
+    res = []
+    for i in arr:
+        if not res or res[-1] != i:
+            res.append(i)
+    return res
+
+
 execute_once()
 
 if not SKIP_SOLVE:
