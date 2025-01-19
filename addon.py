@@ -308,6 +308,60 @@ class LazySegmentTree:
             if ((right >> i) << i) != right:
                 self._update((right - 1) >> i)
 
+    def max_right(self, left, g):
+        if left == self._n:
+            return self._n
+
+        left += self._size
+        for i in range(self._log, 0, -1):
+            self._push(left >> i)
+
+        sm = self._e()
+        first = True
+        while first or (left & -left) != left:
+            first = False
+            while left % 2 == 0:
+                left >>= 1
+            if not g(self._op(sm, self._d[left])):
+                while left < self._size:
+                    self._push(left)
+                    left *= 2
+                    if g(self._op(sm, self._d[left])):
+                        sm = self._op(sm, self._d[left])
+                        left += 1
+                return left - self._size
+            sm = self._op(sm, self._d[left])
+            left += 1
+
+        return self._n
+
+    def min_left(self, right, g):
+        if right == 0:
+            return 0
+
+        right += self._size
+        for i in range(self._log, 0, -1):
+            self._push((right - 1) >> i)
+
+        sm = self._e()
+        first = True
+        while first or (right & -right) != right:
+            first = False
+            right -= 1
+            while right > 1 and right % 2:
+                right >>= 1
+            if not g(self._op(self._d[right], sm)):
+                while right < self._size:
+                    self._push(right)
+                    right = 2 * right + 1
+                    if g(self._op(self._d[right], sm)):
+                        sm = self._op(self._d[right], sm)
+                        right -= 1
+                return right + 1 - self._size
+            sm = self._op(self._d[right], sm)
+
+        return 0
+
 
 class SortedList:
     block_size = 700
