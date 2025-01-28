@@ -130,7 +130,7 @@ def binary_search(left, right, check, start_from_left):
     return ans
 
 
-def set(arr):
+def sorted_unique(arr):
     arr.sort()
     res = []
     for i in arr:
