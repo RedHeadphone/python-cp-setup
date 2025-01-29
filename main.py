@@ -19,6 +19,14 @@ def debug(*x, **y):
 ###############################################################################
 
 
+INPUT_NUMBER_OF_TEST_CASES = 1
+SKIP_SOLVE = 0
+DEBUG_ENABLED = 0
+BOOLEAN_RETURN = 0
+MOD = 10**9 + 7
+TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
+
+
 def solve_bruteforce(case=None):
     pass
 
@@ -30,13 +38,6 @@ def execute_once():
 def solve(case=None):
     pass
 
-
-INPUT_NUMBER_OF_TEST_CASES = 1
-SKIP_SOLVE = 0
-DEBUG_ENABLED = 0
-BOOLEAN_RETURN = 0
-MOD = 10**9 + 7
-TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
 
 ###############################################################################
 
