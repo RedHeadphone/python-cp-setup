@@ -3,40 +3,79 @@ from main import itertools, Counter, heappush, heappop, bisect_left, bisect_righ
 
 class SegmentTree:
     def __init__(self, arr, func=lambda x, y: x + y, default_value_func=lambda: 0):
-        self.n = 1 << (len(arr) - 1).bit_length()
-        self.func = func
-        self.default_value_func = default_value_func
-        self.segmentTree = [self.default_value_func() for _ in range(2 * self.n)]
-        self.segmentTree[self.n : self.n + len(arr)] = arr
-        for i in range(self.n - 1, 0, -1):
-            self.segmentTree[i] = self.func(
-                self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
-            )
+        self._n = len(arr)
+        self._size = 1 << (self._n - 1).bit_length()
+        self._op = func
+        self._e = default_value_func
+        self._d = [self._e() for _ in range(2 * self._size)]
+        self._d[self._size : self._size + len(arr)] = arr
+        for i in range(self._size - 1, 0, -1):
+            self._d[i] = self._op(self._d[2 * i], self._d[2 * i + 1])
 
     def query(self, l, r):
-        l += self.n
-        r += self.n
-        resl = self.default_value_func()
-        resr = self.default_value_func()
+        l += self._size
+        r += self._size
+        resl = self._e()
+        resr = self._e()
         while l < r:
             if l & 1:
-                resl = self.func(resl, self.segmentTree[l])
+                resl = self._op(resl, self._d[l])
                 l += 1
             l >>= 1
             if r & 1:
                 r -= 1
-                resr = self.func(self.segmentTree[r], resr)
+                resr = self._op(self._d[r], resr)
             r >>= 1
-        return self.func(resl, resr)
+        return self._op(resl, resr)
 
     def update(self, i, value):
-        i += self.n
-        self.segmentTree[i] = value
+        i += self._size
+        self._d[i] = value
         while i > 1:
             i >>= 1
-            self.segmentTree[i] = self.func(
-                self.segmentTree[2 * i], self.segmentTree[2 * i + 1]
-            )
+            self._d[i] = self._op(self._d[2 * i], self._d[2 * i + 1])
+
+    def max_right(self, left, f):
+        if left == self._n:
+            return self._n
+        left += self._size
+        sm = self._e()
+        first = True
+        while first or (left & -left) != left:
+            first = False
+            while left % 2 == 0:
+                left >>= 1
+            if not f(self._op(sm, self._d[left])):
+                while left < self._size:
+                    left *= 2
+                    if f(self._op(sm, self._d[left])):
+                        sm = self._op(sm, self._d[left])
+                        left += 1
+                return left - self._size
+            sm = self._op(sm, self._d[left])
+            left += 1
+        return self._n
+
+    def min_left(self, right, f):
+        if right == 0:
+            return 0
+        right += self._size
+        sm = self._e()
+        first = True
+        while first or (right & -right) != right:
+            first = False
+            right -= 1
+            while right > 1 and right % 2:
+                right >>= 1
+            if not f(self._op(self._d[right], sm)):
+                while right < self._size:
+                    right = 2 * right + 1
+                    if f(self._op(self._d[right], sm)):
+                        sm = self._op(self._d[right], sm)
+                        right -= 1
+                return right + 1 - self._size
+            sm = self._op(self._d[right], sm)
+        return 0
 
 
 class UnionFind:
