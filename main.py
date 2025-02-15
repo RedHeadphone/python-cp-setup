@@ -13,18 +13,10 @@ input = lambda: sys.stdin.readline().strip()
 def debug(*x, **y):
     if not DEBUG_ENABLED:
         return
-    print(*x, (y if y != {} else "\b"), file=sys.stderr)
+    print(*(list(x)+([y] if y != {} else [])), file=sys.stderr)
 
 
 ###############################################################################
-
-
-INPUT_NUMBER_OF_TEST_CASES = 1
-SKIP_SOLVE = 0
-DEBUG_ENABLED = 0
-BOOLEAN_RETURN = 0
-MOD = 10**9 + 7
-TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
 
 
 def solve_bruteforce(case=None):
@@ -38,6 +30,12 @@ def execute_once():
 def solve(case=None):
     pass
 
+
+INPUT_NUMBER_OF_TEST_CASES = 1
+DEBUG_ENABLED = 0
+BOOLEAN_RETURN = 0
+TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
+MOD = 10**9 + 7
 
 ###############################################################################
 
@@ -132,6 +130,7 @@ def binary_search(left, right, check, start_from_left):
 
 
 def sorted_unique(arr):
+    arr = arr[::]
     arr.sort()
     res = []
     for i in arr:
@@ -142,7 +141,7 @@ def sorted_unique(arr):
 
 execute_once()
 
-if not SKIP_SOLVE:
+if __name__ == "__main__":
     for t in range(int(input()) if INPUT_NUMBER_OF_TEST_CASES else 1):
         if BOOLEAN_RETURN:
             print(TRUE_MAPPING if solve(t + 1) else FALSE_MAPPING)
