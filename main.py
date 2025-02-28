@@ -1,7 +1,7 @@
 import sys, random, math, string, itertools
 from copy import deepcopy
 from collections import defaultdict, Counter, deque
-from heapq import heapify, heappush, heappop
+from heapq import heapify, heappush, heappop, nlargest, nsmallest
 from functools import cache
 from bisect import bisect_left, bisect_right
 from types import GeneratorType
