@@ -46,7 +46,10 @@ class Factors:
                 self.smallest_prime_factor[i] = i
                 self.primes.append(i)
             for j in range(len(self.primes)):
-                if i * self.primes[j] >= pre_compute_limit or self.primes[j] > self.smallest_prime_factor[i]:
+                if (
+                    i * self.primes[j] >= pre_compute_limit
+                    or self.primes[j] > self.smallest_prime_factor[i]
+                ):
                     break
                 self.smallest_prime_factor[i * self.primes[j]] = self.primes[j]
 
@@ -85,7 +88,6 @@ class Factors:
                 current *= p
 
         return factors
-
 
     def factors_without_memo(self, n):
         factors = set()
