@@ -1,6 +1,19 @@
 from main import MOD, Counter, deque
 
 
+def fft(freq_a, freq_b):  # needs to be executed in Cpython and not in PyPy
+    import numpy as np
+
+    n = len(freq_a) + len(freq_b) - 1
+    n_fft = 2 ** np.ceil(np.log2(n)).astype(int)
+
+    A = np.fft.fft(freq_a, n=n_fft)
+    B = np.fft.fft(freq_b, n=n_fft)
+    C = np.fft.ifft(A * B)
+
+    return np.round(np.real(C)).astype(int)
+
+
 class Combinatorics:
     def __init__(self, pre_compute_limit=0):
         self.fact = [1] * pre_compute_limit
