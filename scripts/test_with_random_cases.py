@@ -34,8 +34,11 @@ class RandomInputGenerator:
     def random_array(self, size=10, lower=0, upper=100):
         return [self.random_int(lower, upper) for _ in range(size)]
 
-    def randome_binary_string(self, size=10):
+    def random_binary_string(self, size=10):
         return "".join([random.choice("01") for _ in range(size)])
+
+    def random_string(self, characters, size=10):
+        return "".join([random.choice(characters) for _ in range(size)])
 
 
 class InputManager:
@@ -47,8 +50,8 @@ class InputManager:
             return " ".join([str(i) for i in input])
         return str(input)
 
-    def add(self, input):
-        self.inputs.append(self.serialize(input))
+    def add(self, *inputs):
+        self.inputs.append(" ".join(self.serialize(input) for input in inputs))
 
 
 ###############################################################################
