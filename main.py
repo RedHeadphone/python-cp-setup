@@ -34,7 +34,7 @@ def solve(case=None):
 INPUT_NUMBER_OF_TEST_CASES = 1
 DEBUG_ENABLED = 0
 BOOLEAN_RETURN = 0
-TRUE_MAPPING, FALSE_MAPPING = "YES", "NO"
+TRUE_MAPPING, FALSE_MAPPING = "Yes", "No"
 MOD = 10**9 + 7
 
 ###############################################################################
