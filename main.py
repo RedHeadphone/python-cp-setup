@@ -41,7 +41,7 @@ MOD = 10**9 + 7
 
 
 class CustomHashMap:
-    def __init__(self, map_type=dict, arg=None):
+    def __init__(self, map_type=dict, arg=[]):
         """
         Custom HashMap for Python's Anti-hash-table test
         :param map_type: type of the map (allowed types: dict, defaultdict, Counter)
